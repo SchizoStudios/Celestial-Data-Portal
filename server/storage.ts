@@ -184,7 +184,7 @@ export class MemStorage implements IStorage {
       ...existing, 
       ...template, 
       updatedAt: new Date(),
-      availableFields: Array.isArray(template.availableFields) ? template.availableFields : existing.availableFields,
+      availableFields: Array.isArray(template.availableFields) ? [...template.availableFields] : existing.availableFields,
     };
     this.podcastTemplates.set(id, updated);
     return updated;

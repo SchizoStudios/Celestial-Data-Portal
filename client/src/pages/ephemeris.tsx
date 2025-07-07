@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar, MapPin, Clock, ArrowLeft } from "lucide-react";
+import { Calendar, MapPin, Clock, ArrowLeft, CircleDot, Share2, Brain } from "lucide-react";
 import { Link } from "wouter";
 
 interface EphemerisData {
@@ -39,6 +39,17 @@ export default function EphemerisPage() {
   const [location, setLocation] = useState("New York, NY");
   const [latitude, setLatitude] = useState("40.7128");
   const [longitude, setLongitude] = useState("-74.0060");
+  const [activeTab, setActiveTab] = useState<'daily' | 'transits'>('daily');
+  const [transitDays, setTransitDays] = useState(7);
+  
+  // Transit comparison state
+  const [natalDate, setNatalDate] = useState(new Date().toISOString().split('T')[0]);
+  const [natalTime, setNatalTime] = useState("12:00");
+  const [natalLocation, setNatalLocation] = useState("New York, NY");
+  const [transitDate, setTransitDate] = useState(new Date().toISOString().split('T')[0]);
+  const [transitTime, setTransitTime] = useState(new Date().toTimeString().slice(0,5));
+  const [transitLocation, setTransitLocation] = useState("New York, NY");
+  const [showAIInterpretation, setShowAIInterpretation] = useState(false);
 
   // Fetch ephemeris data
   const { data: ephemerisData, isLoading } = useQuery<EphemerisData>({
@@ -54,6 +65,42 @@ export default function EphemerisPage() {
       if (!response.ok) throw new Error('Failed to fetch ephemeris data');
       return response.json();
     }
+  });
+
+  // Fetch transit data
+  const { data: transitData, isLoading: transitLoading } = useQuery({
+    queryKey: ["/api/ephemeris/transits", selectedDate, transitDays, latitude, longitude],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        date: selectedDate,
+        days: transitDays.toString(),
+        latitude: latitude,
+        longitude: longitude
+      });
+      const response = await fetch(`/api/ephemeris/transits?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch transit data');
+      return response.json();
+    }
+  });
+
+  // Fetch transit comparison data
+  const { data: transitComparisonData, isLoading: comparisonLoading } = useQuery({
+    queryKey: ["/api/ephemeris/transit-comparison", natalDate, natalTime, natalLocation, transitDate, transitTime, transitLocation, showAIInterpretation],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        natalDate: natalDate,
+        natalTime: natalTime,
+        natalLocation: natalLocation,
+        transitDate: transitDate,
+        transitTime: transitTime,
+        transitLocation: transitLocation,
+        includeAI: showAIInterpretation.toString()
+      });
+      const response = await fetch(`/api/ephemeris/transit-comparison?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch transit comparison');
+      return response.json();
+    },
+    enabled: activeTab === 'transits'
   });
 
   const formatDegrees = (degrees: number, minutes: number) => {
@@ -98,52 +145,146 @@ export default function EphemerisPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="date">Date</Label>
-              <Input
-                id="date"
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-              />
+          <div className="space-y-4">
+            <div className="flex space-x-4 border-b pb-2">
+              <Button 
+                variant={activeTab === 'daily' ? 'default' : 'outline'} 
+                onClick={() => setActiveTab('daily')}
+              >
+                Daily Ephemeris
+              </Button>
+              <Button 
+                variant={activeTab === 'transits' ? 'default' : 'outline'} 
+                onClick={() => setActiveTab('transits')}
+              >
+                Transit Comparison
+              </Button>
             </div>
-            <div>
-              <Label htmlFor="location">Location</Label>
-              <Input
-                id="location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="Enter location"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="lat">Latitude</Label>
-                <Input
-                  id="lat"
-                  type="number"
-                  step="0.0001"
-                  value={latitude}
-                  onChange={(e) => setLatitude(e.target.value)}
-                />
+            
+            {activeTab === 'daily' && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="date">Date</Label>
+                  <Input
+                    id="date"
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="location">Location</Label>
+                  <Input
+                    id="location"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="Enter location"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label htmlFor="lat">Latitude</Label>
+                    <Input
+                      id="lat"
+                      type="number"
+                      step="0.0001"
+                      value={latitude}
+                      onChange={(e) => setLatitude(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="lng">Longitude</Label>
+                    <Input
+                      id="lng"
+                      type="number"
+                      step="0.0001"
+                      value={longitude}
+                      onChange={(e) => setLongitude(e.target.value)}
+                    />
+                  </div>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="lng">Longitude</Label>
-                <Input
-                  id="lng"
-                  type="number"
-                  step="0.0001"
-                  value={longitude}
-                  onChange={(e) => setLongitude(e.target.value)}
-                />
+            )}
+            
+            {activeTab === 'transits' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <h3 className="font-semibold">Natal Chart (Base)</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Natal Date</Label>
+                      <Input
+                        type="date"
+                        value={natalDate}
+                        onChange={(e) => setNatalDate(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label>Natal Time</Label>
+                      <Input
+                        type="time"
+                        value={natalTime}
+                        onChange={(e) => setNatalTime(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Birth Location</Label>
+                    <Input
+                      value={natalLocation}
+                      onChange={(e) => setNatalLocation(e.target.value)}
+                      placeholder="Enter birth location"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <h3 className="font-semibold">Transit Date (Comparison)</h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label>Transit Date</Label>
+                      <Input
+                        type="date"
+                        value={transitDate}
+                        onChange={(e) => setTransitDate(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label>Transit Time</Label>
+                      <Input
+                        type="time"
+                        value={transitTime}
+                        onChange={(e) => setTransitTime(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <Label>Transit Location</Label>
+                    <Input
+                      value={transitLocation}
+                      onChange={(e) => setTransitLocation(e.target.value)}
+                      placeholder="Enter current location"
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="ai-interpretation"
+                      checked={showAIInterpretation}
+                      onChange={(e) => setShowAIInterpretation(e.target.checked)}
+                      className="h-4 w-4"
+                    />
+                    <Label htmlFor="ai-interpretation">Generate AI Interpretation using Astrology Arith(m)etic</Label>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {isLoading ? (
+      {/* Content Display Based on Active Tab */}
+      {activeTab === 'daily' && isLoading ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
             <CardContent className="p-6">
@@ -154,7 +295,7 @@ export default function EphemerisPage() {
             </CardContent>
           </Card>
         </div>
-      ) : ephemerisData ? (
+      ) : activeTab === 'daily' && ephemerisData ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Solar Data */}
           <Card>

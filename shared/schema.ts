@@ -137,35 +137,35 @@ export const CELESTIAL_BODIES = [
 
 export const ASPECT_TYPES = {
   // Major Aspects
-  Conjunction: { symbol: "☌", degrees: 0, category: "Major" },
-  Opposition: { symbol: "☍", degrees: 180, category: "Major" },
-  Sextile: { symbol: "⚹", degrees: 60, category: "Major" },
-  Square: { symbol: "□", degrees: 90, category: "Major" },
-  Trine: { symbol: "△", degrees: 120, category: "Major" },
+  Conjunction: { symbol: "☌", degrees: 0, category: "Major", orb: 8 },
+  Opposition: { symbol: "☍", degrees: 180, category: "Major", orb: 8 },
+  Sextile: { symbol: "⚹", degrees: 60, category: "Major", orb: 6 },
+  Square: { symbol: "□", degrees: 90, category: "Major", orb: 8 },
+  Trine: { symbol: "△", degrees: 120, category: "Major", orb: 8 },
   
   // Minor Aspects
-  Inconjunction: { symbol: "⚻", degrees: 150, category: "Minor" },
-  Quindecile: { symbol: "24°", degrees: 24, category: "Minor" },
-  Semisextile: { symbol: "⚺", degrees: 30, category: "Minor" },
-  Semisquare: { symbol: "◻︎", degrees: 45, category: "Minor" },
-  Sesquiquadrate: { symbol: "⚼", degrees: 135, category: "Minor" },
+  Inconjunction: { symbol: "⚻", degrees: 150, category: "Minor", orb: 3 },
+  Quindecile: { symbol: "24°", degrees: 24, category: "Minor", orb: 2 },
+  Semisextile: { symbol: "⚺", degrees: 30, category: "Minor", orb: 3 },
+  Semisquare: { symbol: "◻︎", degrees: 45, category: "Minor", orb: 3 },
+  Sesquiquadrate: { symbol: "⚼", degrees: 135, category: "Minor", orb: 3 },
   
   // Harmonic Aspects
-  Biquintile: { symbol: "⛤", degrees: 144, category: "Harmonic" },
-  Decile: { symbol: "✷", degrees: 36, category: "Harmonic" },
-  Quintile: { symbol: "⬠", degrees: 72, category: "Harmonic" },
-  Tridecile: { symbol: "108°", degrees: 108, category: "Harmonic" },
-  Vigintile: { symbol: "1/20", degrees: 18, category: "Harmonic" },
+  Biquintile: { symbol: "⛤", degrees: 144, category: "Harmonic", orb: 2 },
+  Decile: { symbol: "✷", degrees: 36, category: "Harmonic", orb: 2 },
+  Quintile: { symbol: "⬠", degrees: 72, category: "Harmonic", orb: 2 },
+  Tridecile: { symbol: "108°", degrees: 108, category: "Harmonic", orb: 2 },
+  Vigintile: { symbol: "1/20", degrees: 18, category: "Harmonic", orb: 1 },
   
   // Septile Aspects
-  Biseptile: { symbol: "⚯", degrees: 102.86, category: "Septile" },
-  Septile: { symbol: "⚯", degrees: 51.43, category: "Septile" },
-  Triseptile: { symbol: "⚯", degrees: 154.29, category: "Septile" },
+  Biseptile: { symbol: "⚯", degrees: 102.86, category: "Septile", orb: 2 },
+  Septile: { symbol: "⚯", degrees: 51.43, category: "Septile", orb: 2 },
+  Triseptile: { symbol: "⚯", degrees: 154.29, category: "Septile", orb: 2 },
   
   // Novile Aspects
-  Binovile: { symbol: "∟", degrees: 80, category: "Novile" },
-  Novile: { symbol: "☊", degrees: 40, category: "Novile" },
-  Quadrinovile: { symbol: "⅘", degrees: 160, category: "Novile" }
+  Binovile: { symbol: "∟", degrees: 80, category: "Novile", orb: 2 },
+  Novile: { symbol: "☊", degrees: 40, category: "Novile", orb: 2 },
+  Quadrinovile: { symbol: "⅘", degrees: 160, category: "Novile", orb: 2 }
 } as const;
 
 export const ASPECT_CATEGORIES = {

@@ -199,4 +199,74 @@ Format as engaging, informative content suitable for an astrology audience.`;
       throw new Error(`Failed to analyze celestial event: ${error}`);
     }
   }
+
+  static async generateTransitInterpretation(
+    natalPositions: any[],
+    transitPositions: any[],
+    significantTransits: any[],
+    context: { natalDate: string; transitDate: string; natalLocation: string; transitLocation: string }
+  ): Promise<any> {
+    try {
+      const prompt = `You are an expert astrologer with access to comprehensive astrological data from the Astrology Arith(m)etic vault. Analyze this transit comparison and provide detailed interpretations.
+
+NATAL CHART DETAILS:
+Date: ${context.natalDate}
+Location: ${context.natalLocation}
+
+TRANSIT CHART DETAILS:
+Date: ${context.transitDate}
+Location: ${context.transitLocation}
+
+SIGNIFICANT TRANSIT ASPECTS:
+${JSON.stringify(significantTransits, null, 2)}
+
+Please provide a comprehensive interpretation including:
+1. Overall transit theme and energy
+2. Detailed analysis of the top 5 most significant transit aspects
+3. Timing and duration insights
+4. Practical guidance and advice
+5. Areas of life most affected
+
+Use the Astrology Arith(m)etic principles for accurate interpretations. Respond in JSON format:`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-pro",
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "object",
+            properties: {
+              overallTheme: { type: "string" },
+              significantAspects: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    aspect: { type: "string" },
+                    interpretation: { type: "string" },
+                    timing: { type: "string" },
+                    advice: { type: "string" }
+                  }
+                }
+              },
+              practicalGuidance: { type: "string" },
+              areasAffected: { type: "array", items: { type: "string" } },
+              timelineInsights: { type: "string" }
+            }
+          }
+        },
+        contents: prompt,
+      });
+
+      const rawJson = response.text;
+      if (rawJson) {
+        return JSON.parse(rawJson);
+      }
+      
+      return null;
+    } catch (error) {
+      console.error("Failed to generate transit interpretation:", error);
+      return null;
+    }
+  }
 }

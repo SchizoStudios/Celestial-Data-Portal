@@ -6,7 +6,8 @@ import {
   insertAspectMonitorSchema,
   insertPodcastTemplateSchema,
   insertPodcastContentSchema,
-  insertEphemerisDataSchema
+  insertEphemerisDataSchema,
+  ASPECT_TYPES
 } from "@shared/schema";
 import { AstronomicalService } from "./services/astronomical";
 import { GeminiService } from "./services/gemini";
@@ -240,11 +241,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const today = new Date();
       const positions = await AstronomicalService.calculatePlanetaryPositions(today, lat, lng);
-      const aspects = AstronomicalService.calculateAspects(positions, [
-        "Conjunction", "Opposition", "Trine", "Square", "Sextile"
-      ]);
+      // Use all available aspects for comprehensive analysis
+      const enabledAspects = Object.keys(ASPECT_TYPES);
+      const aspects = AstronomicalService.calculateAspects(positions, enabledAspects);
       
-      res.json(aspects);
+      // Sort aspects by proximity (exact first, then by smallest orb)
+      const sortedAspects = aspects.sort((a, b) => {
+        // Exact aspects first
+        if (a.exact && !b.exact) return -1;
+        if (!a.exact && b.exact) return 1;
+        
+        // Then sort by orb (smallest first)
+        return a.orb - b.orb;
+      });
+      
+      res.json(sortedAspects);
     } catch (error) {
       res.status(500).json({ message: "Failed to calculate current aspects" });
     }
@@ -260,6 +271,200 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to get aspect interpretation" });
     }
   });
+
+  // Transit data endpoint for comprehensive daily transit tracking
+  app.get("/api/ephemeris/transits", async (req, res) => {
+    try {
+      const { date, days = 7, latitude = 40.7128, longitude = -74.0060 } = req.query;
+      const startDate = date ? new Date(date as string) : new Date();
+      const numDays = parseInt(days as string);
+      
+      const transitData = [];
+      
+      // Calculate transit data for the specified number of days
+      for (let i = 0; i < numDays; i++) {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + i);
+        
+        const positions = await AstronomicalService.calculatePlanetaryPositions(
+          currentDate,
+          parseFloat(latitude as string),
+          parseFloat(longitude as string)
+        );
+        
+        const solarData = await AstronomicalService.calculateSolarData(
+          currentDate,
+          parseFloat(latitude as string),
+          parseFloat(longitude as string)
+        );
+        
+        const lunarData = await AstronomicalService.calculateLunarData(
+          currentDate,
+          parseFloat(latitude as string),
+          parseFloat(longitude as string)
+        );
+        
+        const enabledAspects = Object.keys(ASPECT_TYPES);
+        const aspects = AstronomicalService.calculateAspects(positions, enabledAspects);
+        const sortedAspects = aspects.sort((a, b) => {
+          if (a.exact && !b.exact) return -1;
+          if (!a.exact && b.exact) return 1;
+          return a.orb - b.orb;
+        });
+        
+        transitData.push({
+          date: currentDate.toISOString().split('T')[0],
+          dayOfWeek: currentDate.toLocaleDateString('en', { weekday: 'long' }),
+          positions,
+          solarData,
+          lunarData,
+          aspects: sortedAspects.slice(0, 15), // Top 15 closest aspects
+          aspectCount: sortedAspects.length
+        });
+      }
+      
+      res.json(transitData);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to calculate transit data: " + (error as Error).message });
+    }
+  });
+
+  // Transit comparison endpoint for natal vs transit chart analysis
+  app.get("/api/ephemeris/transit-comparison", async (req, res) => {
+    try {
+      const { 
+        natalDate, 
+        natalTime = "12:00", 
+        natalLocation = "New York, NY",
+        transitDate, 
+        transitTime = "12:00", 
+        transitLocation = "New York, NY",
+        includeAI = "false"
+      } = req.query;
+
+      // Get coordinates for both locations
+      const natalCoords = getLocationCoordinates(natalLocation as string);
+      const transitCoords = getLocationCoordinates(transitLocation as string);
+
+      // Calculate natal chart positions
+      const natalDateTime = new Date(`${natalDate}T${natalTime}:00`);
+      const natalPositions = await AstronomicalService.calculatePlanetaryPositions(
+        natalDateTime,
+        natalCoords.lat,
+        natalCoords.lng
+      );
+
+      // Calculate transit positions
+      const transitDateTime = new Date(`${transitDate}T${transitTime}:00`);
+      const transitPositions = await AstronomicalService.calculatePlanetaryPositions(
+        transitDateTime,
+        transitCoords.lat,
+        transitCoords.lng
+      );
+
+      // Calculate natal aspects
+      const enabledAspects = Object.keys(ASPECT_TYPES);
+      const natalAspects = AstronomicalService.calculateAspects(natalPositions, enabledAspects);
+      const transitAspects = AstronomicalService.calculateAspects(transitPositions, enabledAspects);
+
+      // Calculate transit-to-natal aspects (the key comparison)
+      const transitToNatalAspects = calculateTransitToNatalAspects(transitPositions, natalPositions, enabledAspects);
+
+      // Sort all aspects by proximity
+      const sortedNatalAspects = natalAspects.sort((a, b) => a.orb - b.orb);
+      const sortedTransitAspects = transitAspects.sort((a, b) => a.orb - b.orb);
+      const sortedTransitToNatalAspects = transitToNatalAspects.sort((a, b) => a.orb - b.orb);
+
+      let aiInterpretation = null;
+      if (includeAI === "true") {
+        // Generate AI interpretation using Gemini with Astrology Arith(m)etic data
+        const significantTransits = sortedTransitToNatalAspects.slice(0, 5);
+        aiInterpretation = await GeminiService.generateTransitInterpretation(
+          natalPositions,
+          transitPositions,
+          significantTransits,
+          { 
+            natalDate: natalDate as string, 
+            transitDate: transitDate as string, 
+            natalLocation: natalLocation as string, 
+            transitLocation: transitLocation as string 
+          }
+        );
+      }
+
+      res.json({
+        natal: {
+          date: natalDate,
+          time: natalTime,
+          location: natalLocation,
+          positions: natalPositions,
+          aspects: sortedNatalAspects.slice(0, 20),
+          aspectCount: sortedNatalAspects.length
+        },
+        transit: {
+          date: transitDate,
+          time: transitTime,
+          location: transitLocation,
+          positions: transitPositions,
+          aspects: sortedTransitAspects.slice(0, 20),
+          aspectCount: sortedTransitAspects.length
+        },
+        transitToNatal: {
+          aspects: sortedTransitToNatalAspects.slice(0, 15),
+          aspectCount: sortedTransitToNatalAspects.length
+        },
+        aiInterpretation
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to calculate transit comparison: " + (error as Error).message });
+    }
+  });
+
+  // Helper function to get coordinates
+  function getLocationCoordinates(location: string) {
+    const locationCoords: Record<string, { lat: number; lng: number }> = {
+      "New York, NY": { lat: 40.7128, lng: -74.0060 },
+      "Los Angeles, CA": { lat: 34.0522, lng: -118.2437 },
+      "London, UK": { lat: 51.5074, lng: -0.1278 },
+      "Paris, France": { lat: 48.8566, lng: 2.3522 },
+      "Tokyo, Japan": { lat: 35.6762, lng: 139.6503 },
+      "Sydney, Australia": { lat: -33.8688, lng: 151.2093 },
+    };
+    return locationCoords[location] || { lat: 40.7128, lng: -74.0060 };
+  }
+
+  // Calculate transit-to-natal aspects
+  function calculateTransitToNatalAspects(transitPositions: any[], natalPositions: any[], enabledAspects: string[]) {
+    const aspects = [];
+    
+    for (const transitPlanet of transitPositions) {
+      for (const natalPlanet of natalPositions) {
+        for (const aspectType of enabledAspects) {
+          const aspectInfo = ASPECT_TYPES[aspectType as keyof typeof ASPECT_TYPES];
+          if (!aspectInfo) continue;
+
+          const orb = Math.abs(transitPlanet.longitude - natalPlanet.longitude);
+          const adjustedOrb = Math.min(orb, 360 - orb);
+          const aspectOrb = Math.abs(adjustedOrb - aspectInfo.degrees);
+
+          if (aspectOrb <= aspectInfo.orb) {
+            aspects.push({
+              body1: `Transit ${transitPlanet.name}`,
+              body2: `Natal ${natalPlanet.name}`,
+              aspectType: aspectType,
+              aspectSymbol: aspectInfo.symbol,
+              orb: aspectOrb,
+              exact: aspectOrb < 1,
+              applying: true, // Simplified for now
+              transitType: 'transit-to-natal'
+            });
+          }
+        }
+      }
+    }
+    
+    return aspects;
+  }
 
   // Podcast Templates
   app.get("/api/podcast-templates", async (req, res) => {
