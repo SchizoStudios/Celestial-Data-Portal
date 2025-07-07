@@ -28,10 +28,13 @@ export default function Dashboard() {
   const handleLocationChange = (value: string) => {
     if (value === "Custom Location...") {
       setShowCustomLocation(true);
-      setSelectedLocation("");
+      // Keep the current location while searching
     } else {
       setShowCustomLocation(false);
       setSelectedLocation(value);
+      setCustomLocation("");
+      setLocationSuggestions([]);
+      setShowLocationSuggestions(false);
     }
   };
 
@@ -228,6 +231,7 @@ export default function Dashboard() {
                       size="sm"
                       onClick={() => {
                         setShowCustomLocation(false);
+                        setCustomLocation("");
                         setSelectedLocation("New York, NY");
                         setCustomLocation("");
                         setLocationSuggestions([]);
