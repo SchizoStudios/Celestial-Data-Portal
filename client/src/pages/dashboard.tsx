@@ -9,12 +9,20 @@ import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import AspectTooltip from "@/components/aspect-tooltip";
 import DashboardSettingsComponent from "@/components/dashboard-settings";
+import { LocationService, type LocationResult } from "@/lib/location-service";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedLocation, setSelectedLocation] = useState("New York, NY");
-  const [customLocation, setCustomLocation] = useState("");
+  
+  // Custom location state for dashboard
   const [showCustomLocation, setShowCustomLocation] = useState(false);
+  const [customLocation, setCustomLocation] = useState("");
+  const [isLoadingCustomLocation, setIsLoadingCustomLocation] = useState(false);
+  const [locationSuggestions, setLocationSuggestions] = useState<any[]>([]);
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+  const { toast } = useToast();
   const [selectedTime, setSelectedTime] = useState("12:00");
 
   const handleLocationChange = (value: string) => {
@@ -24,6 +32,71 @@ export default function Dashboard() {
     } else {
       setShowCustomLocation(false);
       setSelectedLocation(value);
+    }
+  };
+
+  // Handle custom location search with map API
+  const handleCustomLocationSearch = async (value: string) => {
+    setCustomLocation(value);
+    setShowLocationSuggestions(false);
+    
+    if (value.length > 2) {
+      setIsLoadingCustomLocation(true);
+      try {
+        const results = await LocationService.searchLocations(value);
+        setLocationSuggestions(results);
+        setShowLocationSuggestions(results.length > 0);
+      } catch (error) {
+        console.error('Location search failed:', error);
+      } finally {
+        setIsLoadingCustomLocation(false);
+      }
+    } else {
+      setLocationSuggestions([]);
+    }
+  };
+
+  const selectCustomLocation = (location: LocationResult) => {
+    setCustomLocation(location.name);
+    setSelectedLocation(location.name);
+    setShowLocationSuggestions(false);
+    setLocationSuggestions([]);
+    toast({
+      title: "Location Updated",
+      description: `Location set to ${location.name}`,
+    });
+  };
+
+  const handleLocationGo = async () => {
+    if (!customLocation.trim()) return;
+    
+    setIsLoadingCustomLocation(true);
+    try {
+      const results = await LocationService.searchLocations(customLocation);
+      if (results.length > 0) {
+        const location = results[0];
+        setSelectedLocation(location.name);
+        setShowCustomLocation(false);
+        setCustomLocation("");
+        toast({
+          title: "Location Updated",
+          description: `Location set to ${location.name}`,
+        });
+      } else {
+        toast({
+          title: "Location Not Found",
+          description: "Please try a different search term or check your spelling.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Search Error",
+        description: "Failed to search for location. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingCustomLocation(false);
     }
   };
 
@@ -74,6 +147,27 @@ export default function Dashboard() {
     return { label: "Separating", color: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400" };
   };
 
+  // Calculate exact aspect timing
+  const getExactAspectTime = (orb: number, applying: boolean) => {
+    if (orb < 1) return "Now (Exact)";
+    if (applying) {
+      // Estimate time until exact based on average planetary motion
+      const hoursUntilExact = orb * 24; // Rough approximation
+      if (hoursUntilExact < 24) {
+        return `${Math.round(hoursUntilExact)}h until exact`;
+      } else {
+        return `${Math.round(hoursUntilExact / 24)}d until exact`;
+      }
+    } else {
+      const hoursAgo = orb * 24;
+      if (hoursAgo < 24) {
+        return `${Math.round(hoursAgo)}h ago (exact)`;
+      } else {
+        return `${Math.round(hoursAgo / 24)}d ago (exact)`;
+      }
+    }
+  };
+
   return (
     <div className="p-6">
       {/* Dashboard Header */}
@@ -113,13 +207,22 @@ export default function Dashboard() {
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4 text-celestial-blue" />
                 {showCustomLocation ? (
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 relative">
                     <Input
-                      placeholder="Enter custom location..."
+                      placeholder="Search any location worldwide..."
                       value={customLocation}
-                      onChange={(e) => setCustomLocation(e.target.value)}
-                      className="w-48"
+                      onChange={(e) => handleCustomLocationSearch(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleLocationGo()}
+                      className="w-64"
                     />
+                    <Button 
+                      variant="default" 
+                      size="sm"
+                      onClick={handleLocationGo}
+                      disabled={!customLocation.trim() || isLoadingCustomLocation}
+                    >
+                      {isLoadingCustomLocation ? 'Loading...' : 'Go'}
+                    </Button>
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -127,10 +230,30 @@ export default function Dashboard() {
                         setShowCustomLocation(false);
                         setSelectedLocation("New York, NY");
                         setCustomLocation("");
+                        setLocationSuggestions([]);
+                        setShowLocationSuggestions(false);
                       }}
                     >
                       Reset
                     </Button>
+                    
+                    {/* Location suggestions dropdown */}
+                    {showLocationSuggestions && locationSuggestions.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-white dark:bg-gray-800 border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                        {locationSuggestions.map((location, index) => (
+                          <div
+                            key={index}
+                            onClick={() => selectCustomLocation(location)}
+                            className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
+                          >
+                            <div className="font-medium text-sm">{location.name}</div>
+                            <div className="text-xs text-gray-500">
+                              {location.country} • {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <Select value={selectedLocation} onValueChange={handleLocationChange}>
@@ -255,6 +378,10 @@ export default function Dashboard() {
                             </p>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
                               Orb: {aspect.orb.toFixed(1)}°
+                            </p>
+                            <p className="text-xs text-blue-600 dark:text-blue-400 font-medium flex items-center">
+                              <Clock className="h-3 w-3 mr-1" />
+                              {getExactAspectTime(aspect.orb, aspect.applying)}
                             </p>
                           </div>
                         </div>
