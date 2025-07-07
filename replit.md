@@ -133,6 +133,8 @@ Changelog:
 - July 07, 2025: Implemented Progressive Web App (PWA) functionality with offline capabilities - added manifest.json, service worker, and IndexedDB offline storage
 - July 07, 2025: Added PWA installer component for native app-like experience on iPhone, Android, and Linux platforms
 - July 07, 2025: Created comprehensive offline storage system using IndexedDB for natal charts, ephemeris data, and user preferences
+- July 07, 2025: Improved mobile portrait display responsiveness across dashboard and admin interfaces with flexible layouts
+- July 07, 2025: Added comprehensive Template Assistant component with guided help for podcast template creation including variables, examples, writing tips, and step-by-step guidance
 ```
 
 ## User Preferences

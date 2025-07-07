@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Edit, Trash2, Save, X } from "lucide-react";
+import { Plus, Edit, Trash2, Save, X, HelpCircle } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import TemplateAssistant from "@/components/template-assistant";
 import type { PodcastTemplate } from "@shared/schema";
 
 export default function AdminTemplates() {
@@ -22,6 +23,26 @@ export default function AdminTemplates() {
     content: "",
     availableFields: [] as string[],
   });
+  const [showAssistant, setShowAssistant] = useState(false);
+
+  const handleInsertText = (text: string) => {
+    if (editingTemplate) {
+      setEditingTemplate({ ...editingTemplate, content: text });
+    } else {
+      setNewTemplate({ ...newTemplate, content: text });
+    }
+  };
+
+  const handleInsertField = (field: string) => {
+    const currentContent = editingTemplate?.content || newTemplate.content;
+    const newContent = currentContent + field;
+    
+    if (editingTemplate) {
+      setEditingTemplate({ ...editingTemplate, content: newContent });
+    } else {
+      setNewTemplate({ ...newTemplate, content: newContent });
+    }
+  };
 
   const { data: templates, isLoading } = useQuery({
     queryKey: ["/api/podcast-templates"],
@@ -121,21 +142,30 @@ export default function AdminTemplates() {
   }
 
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-3 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold">Podcast Templates</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold">Podcast Templates</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Create and manage templates for automated podcast content generation
           </p>
         </div>
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              New Template
-            </Button>
-          </DialogTrigger>
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+          <Button 
+            variant="outline" 
+            onClick={() => setShowAssistant(!showAssistant)}
+            className="w-full sm:w-auto"
+          >
+            <HelpCircle className="mr-2 h-4 w-4" />
+            {showAssistant ? 'Hide' : 'Show'} Assistant
+          </Button>
+          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+            <DialogTrigger asChild>
+              <Button className="w-full sm:w-auto">
+                <Plus className="h-4 w-4 mr-2" />
+                New Template
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>Create New Template</DialogTitle>
@@ -199,9 +229,19 @@ export default function AdminTemplates() {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
-      <div className="grid gap-6">
+      {showAssistant && (
+        <div className="mb-6">
+          <TemplateAssistant 
+            onInsertText={handleInsertText}
+            onInsertField={handleInsertField}
+          />
+        </div>
+      )}
+
+      <div className="grid gap-4 lg:gap-6">
         {templates?.map((template: PodcastTemplate) => (
           <Card key={template.id}>
             <CardHeader>

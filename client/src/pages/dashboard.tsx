@@ -212,32 +212,32 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-3 sm:p-6">
       {/* Dashboard Header */}
-      <div className="mb-8">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <div className="flex items-center space-x-3">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Astronomical Dashboard</h2>
+      <div className="mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 space-y-4 sm:space-y-0">
+          <div className="flex-1">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Astronomical Dashboard</h2>
               {isOffline && (
-                <Badge variant="secondary" className="flex items-center space-x-1">
+                <Badge variant="secondary" className="flex items-center space-x-1 w-fit">
                   <WifiOff className="h-3 w-3" />
-                  <span>Offline Mode</span>
+                  <span className="text-xs">Offline Mode</span>
                 </Badge>
               )}
             </div>
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
               {isOffline ? "Working offline with cached data" : "Real-time celestial data and astrological insights"}
             </p>
           </div>
-          <div className="flex space-x-3">
+          <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
             <Link href="/natal-charts">
-              <Button className="bg-celestial-blue hover:bg-blue-700 text-white">
+              <Button className="w-full sm:w-auto bg-celestial-blue hover:bg-blue-700 text-white">
                 <Plus className="mr-2 h-4 w-4" />
                 New Chart
               </Button>
             </Link>
-            <Button variant="outline">
+            <Button variant="outline" className="w-full sm:w-auto">
               <Download className="mr-2 h-4 w-4" />
               Export Data
             </Button>
@@ -246,8 +246,8 @@ export default function Dashboard() {
 
         {/* Date and Location Selector */}
         <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center space-x-4">
+          <CardContent className="p-3 sm:p-4">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
               <div className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4 text-celestial-blue" />
                 <Input
