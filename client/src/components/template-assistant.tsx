@@ -44,45 +44,45 @@ export default function TemplateAssistant({ onInsertText, onInsertField }: Templ
   };
 
   const availableFields = [
-    { name: "{{date}}", description: "Current date", category: "datetime" },
-    { name: "{{time}}", description: "Current time", category: "datetime" },
-    { name: "{{location}}", description: "Selected location", category: "location" },
-    { name: "{{sunrise}}", description: "Sunrise time", category: "solar" },
-    { name: "{{sunset}}", description: "Sunset time", category: "solar" },
-    { name: "{{moonPhase}}", description: "Current moon phase", category: "lunar" },
-    { name: "{{sunSign}}", description: "Sun's zodiac sign", category: "zodiac" },
-    { name: "{{moonSign}}", description: "Moon's zodiac sign", category: "zodiac" },
-    { name: "{{aspects}}", description: "Current aspects", category: "aspects" },
-    { name: "{{planetaryPositions}}", description: "All planetary positions", category: "planets" },
-    { name: "{{retrogradeList}}", description: "Planets in retrograde", category: "planets" },
-    { name: "{{dominantElement}}", description: "Dominant astrological element", category: "analysis" },
-    { name: "{{energyForecast}}", description: "Daily energy forecast", category: "analysis" },
+    { name: "\\{\\{date\\}\\}", description: "Current date", category: "datetime" },
+    { name: "\\{\\{time\\}\\}", description: "Current time", category: "datetime" },
+    { name: "\\{\\{location\\}\\}", description: "Selected location", category: "location" },
+    { name: "\\{\\{sunrise\\}\\}", description: "Sunrise time", category: "solar" },
+    { name: "\\{\\{sunset\\}\\}", description: "Sunset time", category: "solar" },
+    { name: "\\{\\{moonPhase\\}\\}", description: "Current moon phase", category: "lunar" },
+    { name: "\\{\\{sunSign\\}\\}", description: "Sun's zodiac sign", category: "zodiac" },
+    { name: "\\{\\{moonSign\\}\\}", description: "Moon's zodiac sign", category: "zodiac" },
+    { name: "\\{\\{aspects\\}\\}", description: "Current aspects", category: "aspects" },
+    { name: "\\{\\{planetaryPositions\\}\\}", description: "All planetary positions", category: "planets" },
+    { name: "\\{\\{retrogradeList\\}\\}", description: "Planets in retrograde", category: "planets" },
+    { name: "\\{\\{dominantElement\\}\\}", description: "Dominant astrological element", category: "analysis" },
+    { name: "\\{\\{energyForecast\\}\\}", description: "Daily energy forecast", category: "analysis" },
   ];
 
   const templateExamples = [
     {
       name: "Daily Horoscope",
       description: "A comprehensive daily astrological reading",
-      content: `Welcome to your daily cosmic forecast for {{date}} in {{location}}.
+      content: `Welcome to your daily cosmic forecast for \{\{date\}\} in \{\{location\}\}.
 
-The Sun rises at {{sunrise}} and sets at {{sunset}}, giving us {{dayLength}} of daylight energy to work with.
+The Sun rises at \{\{sunrise\}\} and sets at \{\{sunset\}\}, giving us \{\{dayLength\}\} of daylight energy to work with.
 
 CELESTIAL HIGHLIGHTS:
-🌞 Sun in {{sunSign}} - {{sunDescription}}
-🌙 Moon in {{moonSign}} ({{moonPhase}}) - {{moonDescription}}
+🌞 Sun in \{\{sunSign\}\} - \{\{sunDescription\}\}
+🌙 Moon in \{\{moonSign\}\} (\{\{moonPhase\}\}) - \{\{moonDescription\}\}
 
 PLANETARY ASPECTS:
-{{aspects}}
+\{\{aspects\}\}
 
 TODAY'S ENERGY:
-The dominant element today is {{dominantElement}}, suggesting {{energyForecast}}.
+The dominant element today is \{\{dominantElement\}\}, suggesting \{\{energyForecast\}\}.
 
-{{#if retrogradeList}}
-RETROGRADE ALERT: {{retrogradeList}} - Exercise extra caution in communication and travel.
-{{/if}}
+\{\{#if retrogradeList\}\}
+RETROGRADE ALERT: \{\{retrogradeList\}\} - Exercise extra caution in communication and travel.
+\{\{/if\}\}
 
 ADVICE FOR TODAY:
-{{dailyAdvice}}
+\{\{dailyAdvice\}\}
 
 May the stars guide your path today! ✨`
     },
@@ -90,64 +90,64 @@ May the stars guide your path today! ✨`
       name: "Weekly Forecast",
       description: "A detailed weekly astrological overview",
       content: `WEEKLY COSMIC WEATHER REPORT
-{{startDate}} - {{endDate}}
+\{\{startDate\}\} - \{\{endDate\}\}
 
-This week's astrological landscape brings {{weeklyTheme}} energy as we navigate through {{majorAspects}}.
+This week's astrological landscape brings \{\{weeklyTheme\}\} energy as we navigate through \{\{majorAspects\}\}.
 
 KEY PLANETARY MOVEMENTS:
-{{planetaryTransits}}
+\{\{planetaryTransits\}\}
 
 WEEKLY THEMES:
-Monday-Tuesday: {{earlyWeekEnergy}}
-Wednesday-Thursday: {{midWeekEnergy}}
-Friday-Sunday: {{weekendEnergy}}
+Monday-Tuesday: \{\{earlyWeekEnergy\}\}
+Wednesday-Thursday: \{\{midWeekEnergy\}\}
+Friday-Sunday: \{\{weekendEnergy\}\}
 
 AREAS OF FOCUS:
-• Career & Goals: {{careerForecast}}
-• Relationships: {{relationshipForecast}}
-• Health & Wellness: {{healthForecast}}
-• Creativity: {{creativityForecast}}
+• Career & Goals: \{\{careerForecast\}\}
+• Relationships: \{\{relationshipForecast\}\}
+• Health & Wellness: \{\{healthForecast\}\}
+• Creativity: \{\{creativityForecast\}\}
 
 BEST DAYS FOR:
-{{bestDaysFor}}
+\{\{bestDaysFor\}\}
 
 DAYS TO BE CAUTIOUS:
-{{cautiousDays}}
+\{\{cautiousDays\}\}
 
-Weekly Mantra: "{{weeklyMantra}}"
+Weekly Mantra: "\{\{weeklyMantra\}\}"
 
 Remember, the stars suggest, but you decide! 🌟`
     },
     {
       name: "New Moon Intention Setting",
       description: "A guide for new moon manifestation",
-      content: `NEW MOON IN {{moonSign}} - {{date}}
+      content: `NEW MOON IN \{\{moonSign\}\} - \{\{date\}\}
 Time to plant new seeds of intention 🌑
 
 LUNAR ENERGY:
-The New Moon occurs at {{moonTime}} in {{moonSign}}, offering us {{newMoonDescription}}.
+The New Moon occurs at \{\{moonTime\}\} in \{\{moonSign\}\}, offering us \{\{newMoonDescription\}\}.
 
 MANIFESTATION THEMES:
-{{manifestationThemes}}
+\{\{manifestationThemes\}\}
 
 RITUAL SUGGESTIONS:
-1. {{ritualStep1}}
-2. {{ritualStep2}}
-3. {{ritualStep3}}
+1. \{\{ritualStep1\}\}
+2. \{\{ritualStep2\}\}
+3. \{\{ritualStep3\}\}
 
 INTENTION SETTING PROMPTS:
 • What do I want to release from the past lunar cycle?
 • What new energy do I want to invite in?
-• How can I align with {{moonSign}} energy?
+• How can I align with \{\{moonSign\}\} energy?
 
 PLANETARY SUPPORT:
-{{supportivePlanets}}
+\{\{supportivePlanets\}\}
 
 AFFIRMATION:
-"{{newMoonAffirmation}}"
+"\{\{newMoonAffirmation\}\}"
 
-Best time for ritual: {{bestRitualTime}}
-Duration of this lunar influence: {{lunarInfluenceDuration}}
+Best time for ritual: \{\{bestRitualTime\}\}
+Duration of this lunar influence: \{\{lunarInfluenceDuration\}\}
 
 Trust in the cosmic timing of your dreams! 🌟`
     },
@@ -155,33 +155,33 @@ Trust in the cosmic timing of your dreams! 🌟`
       name: "Mercury Retrograde Guide",
       description: "Navigate Mercury retrograde periods",
       content: `MERCURY RETROGRADE SURVIVAL GUIDE
-{{startDate}} - {{endDate}} in {{retrogradeSign}}
+\{\{startDate\}\} - \{\{endDate\}\} in \{\{retrogradeSign\}\}
 
 WHAT TO EXPECT:
-Mercury, the planet of communication and technology, appears to move backward through {{retrogradeSign}}, bringing {{retrogradeThemes}}.
+Mercury, the planet of communication and technology, appears to move backward through \{\{retrogradeSign\}\}, bringing \{\{retrogradeThemes\}\}.
 
 THE 3 R'S APPROACH:
-• REFLECT: {{reflectionGuidance}}
-• REVIEW: {{reviewGuidance}}
-• REVISE: {{reviseGuidance}}
+• REFLECT: \{\{reflectionGuidance\}\}
+• REVIEW: \{\{reviewGuidance\}\}
+• REVISE: \{\{reviseGuidance\}\}
 
 AREAS TO BE EXTRA CAREFUL:
-⚠️ Communication: {{communicationAdvice}}
-⚠️ Technology: {{techAdvice}}
-⚠️ Travel: {{travelAdvice}}
-⚠️ Contracts: {{contractAdvice}}
+⚠️ Communication: \{\{communicationAdvice\}\}
+⚠️ Technology: \{\{techAdvice\}\}
+⚠️ Travel: \{\{travelAdvice\}\}
+⚠️ Contracts: \{\{contractAdvice\}\}
 
 WHAT TO AVOID:
-{{avoidanceList}}
+\{\{avoidanceList\}\}
 
 WHAT TO EMBRACE:
-{{embraceList}}
+\{\{embraceList\}\}
 
 RETROGRADE OPPORTUNITIES:
-{{opportunities}}
+\{\{opportunities\}\}
 
 PROTECTIVE PRACTICES:
-{{protectivePractices}}
+\{\{protectivePractices\}\}
 
 Remember: Retrograde periods are not about fear, but about mindful navigation! 🧭`
     }
@@ -390,8 +390,8 @@ Remember: Retrograde periods are not about fear, but about mindful navigation! �
                   <CardTitle className="text-sm">Step 3: Add Dynamic Content</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
-                  <div>• Use variables like <code>{{date}}</code> and <code>{{location}}</code> for personalization</div>
-                  <div>• Include conditional content with <code>{{#if condition}}</code> blocks</div>
+                  <div>• Use variables like <code>{'{{date}}'}</code> and <code>{'{{location}}'}</code> for personalization</div>
+                  <div>• Include conditional content with <code>{'{{#if condition}}'}</code> blocks</div>
                   <div>• Add lists and loops for planetary positions and aspects</div>
                   <div>• Use descriptive variables for richer, more engaging content</div>
                 </CardContent>
