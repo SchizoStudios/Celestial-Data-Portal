@@ -37,22 +37,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/natal-charts", async (req, res) => {
     try {
-      const validatedData = insertNatalChartSchema.parse(req.body);
+      // Convert birthDate string to Date object and ensure arrays
+      const bodyWithDate = {
+        ...req.body,
+        birthDate: new Date(req.body.birthDate),
+        enabledBodies: Array.isArray(req.body.enabledBodies) ? req.body.enabledBodies : [],
+        enabledAspects: Array.isArray(req.body.enabledAspects) ? req.body.enabledAspects : [],
+        majorAspects: Array.isArray(req.body.majorAspects) ? req.body.majorAspects : ["Conjunction", "Opposition", "Trine", "Square"]
+      };
+      const validatedData = insertNatalChartSchema.parse(bodyWithDate);
       
       // Calculate chart data
+      const enabledBodies = validatedData.enabledBodies && validatedData.enabledBodies.length > 0 
+        ? validatedData.enabledBodies 
+        : ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"];
+      
       const positions = await AstronomicalService.calculatePlanetaryPositions(
         validatedData.birthDate,
         validatedData.latitude,
         validatedData.longitude
       );
       
-      const aspects = AstronomicalService.calculateAspects(positions, validatedData.enabledAspects || []);
+      const enabledAspects = validatedData.enabledAspects && validatedData.enabledAspects.length > 0 
+        ? validatedData.enabledAspects 
+        : ["Conjunction", "Opposition", "Trine", "Square", "Sextile"];
+      
+      const aspects = AstronomicalService.calculateAspects(positions, enabledAspects as string[]);
       
       const chartData = {
         positions: positions || [],
         aspects: aspects || [],
         houses: [], // Simplified - would calculate houses in full implementation
-      };
+      } as any;
       
       const chart = await storage.createNatalChart({
         ...validatedData,
@@ -180,7 +196,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           longitude: lng,
           solarData,
           lunarData,
-          planetaryPositions,
+          planetaryPositions: planetaryPositions as any,
         });
       }
       

@@ -10,7 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { CircleDot, Brain, Save, FileDown, Share, Plus } from "lucide-react";
 import ChartCanvas from "@/components/chart-canvas";
-import { CELESTIAL_BODIES, ASPECT_TYPES } from "@shared/schema";
+import { CELESTIAL_BODIES, ASPECT_TYPES, ASPECT_CATEGORIES } from "@shared/schema";
 
 export default function NatalCharts() {
   const { toast } = useToast();
@@ -292,23 +292,33 @@ export default function NatalCharts() {
                       </div>
                     </div>
 
-                    {/* Aspects */}
+                    {/* Aspects by Category */}
                     <div className="mb-6">
                       <Label className="text-sm font-medium mb-2 block">Aspects</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {ASPECT_TYPES.map((aspect) => (
-                          <div key={aspect.name} className="flex items-center space-x-2">
-                            <Checkbox
-                              id={`aspect-${aspect.name}`}
-                              checked={formData.enabledAspects.includes(aspect.name)}
-                              onCheckedChange={(checked) => handleAspectToggle(aspect.name, !!checked)}
-                            />
-                            <Label htmlFor={`aspect-${aspect.name}`} className="text-sm">
-                              {aspect.name} ({aspect.degrees}°)
-                            </Label>
+                      {Object.entries(ASPECT_CATEGORIES).map(([categoryName, aspectNames]) => (
+                        <div key={categoryName} className="mb-4">
+                          <Label className="text-xs font-semibold text-purple-600 mb-1 block">
+                            {categoryName} Aspects
+                          </Label>
+                          <div className="grid grid-cols-2 gap-1">
+                            {aspectNames.map((aspectName) => {
+                              const aspectData = ASPECT_TYPES[aspectName as keyof typeof ASPECT_TYPES];
+                              return (
+                                <div key={aspectName} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`aspect-${aspectName}`}
+                                    checked={formData.enabledAspects.includes(aspectName)}
+                                    onCheckedChange={(checked) => handleAspectToggle(aspectName, !!checked)}
+                                  />
+                                  <Label htmlFor={`aspect-${aspectName}`} className="text-xs">
+                                    {aspectData.symbol} {aspectName} ({aspectData.degrees}°)
+                                  </Label>
+                                </div>
+                              );
+                            })}
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
