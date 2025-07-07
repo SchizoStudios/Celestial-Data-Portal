@@ -76,28 +76,7 @@ export const aspectMonitors = pgTable("aspect_monitors", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Podcast Templates
-export const podcastTemplates = pgTable("podcast_templates", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  content: text("content").notNull(),
-  availableFields: jsonb("available_fields").$type<string[]>().notNull().default([]),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
 
-// Generated Podcast Content
-export const podcastContent = pgTable("podcast_content", {
-  id: serial("id").primaryKey(),
-  templateId: integer("template_id").references(() => podcastTemplates.id),
-  date: timestamp("date").notNull(),
-  textContent: text("text_content").notNull(),
-  audioUrl: text("audio_url"),
-  videoUrl: text("video_url"),
-  visualizationStyle: text("visualization_style").default("geometric"),
-  status: text("status").notNull().default("generated"), // generated, processing, completed
-  createdAt: timestamp("created_at").defaultNow(),
-});
 
 // Ephemeris Data Cache
 export const ephemerisData = pgTable("ephemeris_data", {
@@ -132,16 +111,7 @@ export const insertAspectMonitorSchema = createInsertSchema(aspectMonitors).omit
   createdAt: true,
 });
 
-export const insertPodcastTemplateSchema = createInsertSchema(podcastTemplates).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
 
-export const insertPodcastContentSchema = createInsertSchema(podcastContent).omit({
-  id: true,
-  createdAt: true,
-});
 
 export const insertEphemerisDataSchema = createInsertSchema(ephemerisData).omit({
   id: true,
@@ -155,11 +125,7 @@ export type InsertNatalChart = z.infer<typeof insertNatalChartSchema>;
 export type AspectMonitor = typeof aspectMonitors.$inferSelect;
 export type InsertAspectMonitor = z.infer<typeof insertAspectMonitorSchema>;
 
-export type PodcastTemplate = typeof podcastTemplates.$inferSelect;
-export type InsertPodcastTemplate = z.infer<typeof insertPodcastTemplateSchema>;
 
-export type PodcastContent = typeof podcastContent.$inferSelect;
-export type InsertPodcastContent = z.infer<typeof insertPodcastContentSchema>;
 
 export type EphemerisData = typeof ephemerisData.$inferSelect;
 export type InsertEphemerisData = z.infer<typeof insertEphemerisDataSchema>;

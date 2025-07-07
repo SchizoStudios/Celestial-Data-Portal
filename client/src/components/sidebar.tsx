@@ -3,10 +3,7 @@ import {
   CircleDot, 
   Calendar, 
   Share2, 
-  Route, 
-  Mic, 
-  FileText, 
-  List
+  Route
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
@@ -27,11 +24,7 @@ export default function Sidebar() {
     { href: "/transits", icon: Route, label: "Transits", active: location === "/transits" },
   ];
 
-  const adminItems = [
-    { href: "/admin-podcast", icon: Mic, label: "Podcast Generator", active: location === "/admin-podcast" },
-    { href: "/admin-templates", icon: FileText, label: "Templates", active: location === "/admin-templates" },
-    { href: "/admin-batch", icon: List, label: "Batch Processing", active: location === "/admin-batch" },
-  ];
+
 
   return (
     <aside className="w-64 bg-white dark:bg-nebula-gray shadow-sm h-screen sticky top-16 overflow-y-auto">
@@ -84,28 +77,7 @@ export default function Sidebar() {
               </Link>
             );
           })}
-          
-          {/* Admin Section */}
-          <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2">ADMIN TOOLS</p>
-            {adminItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    item.active
-                      ? "bg-stellar-amber text-white"
-                      : "text-stellar-amber hover:bg-yellow-50 dark:hover:bg-yellow-900/20"
-                  }`}
-                >
-                  <Icon className="mr-3 h-4 w-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
+
         </nav>
       </div>
     </aside>

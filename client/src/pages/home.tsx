@@ -158,13 +158,13 @@ export default function Home() {
                 <div className="space-y-3">
                   <h4 className="font-semibold text-gray-900 dark:text-white">Advanced Features</h4>
                   <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                    <li>• Generate content with our podcast templates</li>
                     <li>• Compare transit positions with natal charts</li>
                     <li>• Access comprehensive aspect interpretations</li>
+                    <li>• Monitor important astrological aspects</li>
                   </ul>
-                  <Link href="/admin-podcast">
+                  <Link href="/aspect-monitor">
                     <Button size="sm" variant="outline" className="border-stellar-amber text-stellar-amber hover:bg-stellar-amber hover:text-white">
-                      Explore Templates
+                      Monitor Aspects
                     </Button>
                   </Link>
                 </div>

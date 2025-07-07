@@ -8,8 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Dashboard from "@/pages/dashboard";
 import NatalCharts from "@/pages/natal-charts";
 import AspectMonitor from "@/pages/aspect-monitor";
-import AdminPodcast from "@/pages/admin-podcast";
-import AdminTemplates from "@/pages/admin-templates";
+
 import Landing from "@/pages/landing";
 import Home from "@/pages/home";
 import Navbar from "@/components/navbar";
@@ -31,8 +30,7 @@ function Router() {
           <Route path="/natal-charts" component={NatalCharts} />
           <Route path="/aspect-monitor" component={AspectMonitor} />
           <Route path="/ephemeris" component={Dashboard} />
-          <Route path="/admin-podcast" component={AdminPodcast} />
-          <Route path="/admin-templates" component={AdminTemplates} />
+
         </>
       )}
       <Route component={NotFound} />

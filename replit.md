@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a full-stack astronomical data portal application built for calculating, monitoring, and generating content around astrological and astronomical events. The system provides natal chart calculations, aspect monitoring, ephemeris data tracking, and automated podcast content generation. It's designed as a comprehensive platform for astronomical intelligence with both user-facing features and administrative tools.
+This is a full-stack astronomical data portal application built for calculating, monitoring, and analyzing astrological and astronomical events. The system provides natal chart calculations, aspect monitoring, and ephemeris data tracking. It's designed as a comprehensive platform for astronomical intelligence focused on core astrological functionality.
 
 ## System Architecture
 
@@ -39,13 +39,11 @@ This is a full-stack astronomical data portal application built for calculating,
 - **Sessions**: PostgreSQL-backed session storage for authentication
 - **Natal Charts**: Store birth data, calculated positions, aspects, and AI interpretations
 - **Aspect Monitors**: Track specific astrological aspects with notification preferences
-- **Podcast Templates**: Content templates for automated podcast generation
-- **Podcast Content**: Generated content with associated metadata
 - **Ephemeris Data**: Astronomical position data for specific dates/locations
 
 ### Astronomical Services
 - **AstronomicalService**: Calculates planetary positions, aspects, and chart data
-- **GeminiService**: Generates astrological interpretations and podcast content using Google Gemini 2.5 Flash/Pro
+- **GeminiService**: Generates astrological interpretations using Google Gemini 2.5 Flash/Pro
 - **AstrologyDataService**: Integrates comprehensive astrology data from user's vault for enhanced interpretations
 - **Chart Renderer**: SVG-based natal chart visualization system
 
@@ -57,12 +55,11 @@ This is a full-stack astronomical data portal application built for calculating,
 ## Data Flow
 
 1. **Authentication**: Replit Auth handles user login/logout with session management
-2. **User Input**: Birth data, monitoring preferences, or content requests
+2. **User Input**: Birth data and monitoring preferences
 3. **Calculation**: Astronomical calculations for planetary positions and aspects
-4. **Storage**: Persistent storage of charts, monitors, and generated content
-5. **AI Enhancement**: OpenAI integration for interpretations and content generation
+4. **Storage**: Persistent storage of charts and monitors
+5. **AI Enhancement**: Google Gemini integration for astrological interpretations
 6. **Visualization**: SVG chart rendering and responsive UI components
-7. **Export**: Audio/video generation capabilities for podcast content
 
 ## External Dependencies
 
@@ -117,7 +114,6 @@ Changelog:
 - July 07, 2025: Initial setup
 - July 07, 2025: Switched from OpenAI to Google Gemini 2.5 Flash/Pro for AI interpretations
 - July 07, 2025: Integrated comprehensive astrology data from user's "Astrology Arith(m)etic Vault"
-- July 07, 2025: Added admin templates page for podcast content management
 - July 07, 2025: Enhanced storage layer with proper type handling
 - July 07, 2025: Implemented comprehensive aspect system with 26 aspects across 5 categories (Major, Minor, Harmonic, Septile, Novile)
 - July 07, 2025: Fixed dashboard custom location functionality with proper coordinate mapping
@@ -134,7 +130,7 @@ Changelog:
 - July 07, 2025: Added PWA installer component for native app-like experience on iPhone, Android, and Linux platforms
 - July 07, 2025: Created comprehensive offline storage system using IndexedDB for natal charts, ephemeris data, and user preferences
 - July 07, 2025: Improved mobile portrait display responsiveness across dashboard and admin interfaces with flexible layouts
-- July 07, 2025: Added comprehensive Template Assistant component with guided help for podcast template creation including variables, examples, writing tips, and step-by-step guidance
+- July 07, 2025: Removed admin tools for podcast creation - simplified application to focus on core astrological functionality including natal charts, aspect monitoring, and ephemeris data
 ```
 
 ## User Preferences

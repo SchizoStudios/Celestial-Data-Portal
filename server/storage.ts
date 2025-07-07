@@ -2,17 +2,11 @@ import {
   users,
   natalCharts,
   aspectMonitors,
-  podcastTemplates,
-  podcastContent,
   ephemerisData,
   NatalChart, 
   InsertNatalChart,
   AspectMonitor,
   InsertAspectMonitor,
-  PodcastTemplate,
-  InsertPodcastTemplate,
-  PodcastContent,
-  InsertPodcastContent,
   EphemerisData,
   InsertEphemerisData,
   User,
@@ -42,19 +36,7 @@ export interface IStorage {
   updateAspectMonitor(id: number, monitor: Partial<InsertAspectMonitor>): Promise<AspectMonitor | undefined>;
   deleteAspectMonitor(id: number): Promise<boolean>;
 
-  // Podcast Templates
-  getPodcastTemplate(id: number): Promise<PodcastTemplate | undefined>;
-  getAllPodcastTemplates(): Promise<PodcastTemplate[]>;
-  createPodcastTemplate(template: InsertPodcastTemplate): Promise<PodcastTemplate>;
-  updatePodcastTemplate(id: number, template: Partial<InsertPodcastTemplate>): Promise<PodcastTemplate | undefined>;
-  deletePodcastTemplate(id: number): Promise<boolean>;
 
-  // Podcast Content
-  getPodcastContent(id: number): Promise<PodcastContent | undefined>;
-  getAllPodcastContent(): Promise<PodcastContent[]>;
-  getPodcastContentByDateRange(startDate: Date, endDate: Date): Promise<PodcastContent[]>;
-  createPodcastContent(content: InsertPodcastContent): Promise<PodcastContent>;
-  updatePodcastContent(id: number, content: Partial<InsertPodcastContent>): Promise<PodcastContent | undefined>;
 
   // Ephemeris Data
   getEphemerisData(date: Date, location?: string): Promise<EphemerisData | undefined>;
@@ -65,8 +47,6 @@ export class MemStorage implements IStorage {
   private users: Map<string, User> = new Map();
   private natalCharts: Map<number, NatalChart> = new Map();
   private aspectMonitors: Map<number, AspectMonitor> = new Map();
-  private podcastTemplates: Map<number, PodcastTemplate> = new Map();
-  private podcastContent: Map<number, PodcastContent> = new Map();
   private ephemerisData: Map<string, EphemerisData> = new Map();
   private currentId: number = 1;
 
@@ -190,86 +170,7 @@ export class MemStorage implements IStorage {
     return this.aspectMonitors.delete(id);
   }
 
-  // Podcast Templates
-  async getPodcastTemplate(id: number): Promise<PodcastTemplate | undefined> {
-    return this.podcastTemplates.get(id);
-  }
 
-  async getAllPodcastTemplates(): Promise<PodcastTemplate[]> {
-    return Array.from(this.podcastTemplates.values());
-  }
-
-  async createPodcastTemplate(template: InsertPodcastTemplate): Promise<PodcastTemplate> {
-    const id = this.currentId++;
-    const now = new Date();
-    const newTemplate: PodcastTemplate = {
-      ...template,
-      id,
-      createdAt: now,
-      updatedAt: now,
-      availableFields: (template.availableFields as string[]) || [],
-    };
-    this.podcastTemplates.set(id, newTemplate);
-    return newTemplate;
-  }
-
-  async updatePodcastTemplate(id: number, template: Partial<InsertPodcastTemplate>): Promise<PodcastTemplate | undefined> {
-    const existing = this.podcastTemplates.get(id);
-    if (!existing) return undefined;
-    
-    const updated = { 
-      ...existing, 
-      ...template, 
-      updatedAt: new Date(),
-      availableFields: Array.isArray(template.availableFields) ? [...template.availableFields] : existing.availableFields,
-    };
-    this.podcastTemplates.set(id, updated);
-    return updated;
-  }
-
-  async deletePodcastTemplate(id: number): Promise<boolean> {
-    return this.podcastTemplates.delete(id);
-  }
-
-  // Podcast Content
-  async getPodcastContent(id: number): Promise<PodcastContent | undefined> {
-    return this.podcastContent.get(id);
-  }
-
-  async getAllPodcastContent(): Promise<PodcastContent[]> {
-    return Array.from(this.podcastContent.values());
-  }
-
-  async getPodcastContentByDateRange(startDate: Date, endDate: Date): Promise<PodcastContent[]> {
-    return Array.from(this.podcastContent.values()).filter(
-      content => content.date >= startDate && content.date <= endDate
-    );
-  }
-
-  async createPodcastContent(content: InsertPodcastContent): Promise<PodcastContent> {
-    const id = this.currentId++;
-    const newContent: PodcastContent = {
-      ...content,
-      id,
-      createdAt: new Date(),
-      status: content.status || 'draft',
-      templateId: content.templateId || null,
-      audioUrl: content.audioUrl || null,
-      videoUrl: content.videoUrl || null,
-      visualizationStyle: content.visualizationStyle || null,
-    };
-    this.podcastContent.set(id, newContent);
-    return newContent;
-  }
-
-  async updatePodcastContent(id: number, content: Partial<InsertPodcastContent>): Promise<PodcastContent | undefined> {
-    const existing = this.podcastContent.get(id);
-    if (!existing) return undefined;
-    
-    const updated = { ...existing, ...content };
-    this.podcastContent.set(id, updated);
-    return updated;
-  }
 
   // Ephemeris Data
   async getEphemerisData(date: Date, location?: string): Promise<EphemerisData | undefined> {
@@ -394,70 +295,7 @@ export class DatabaseStorage implements IStorage {
     return result.rowCount > 0;
   }
 
-  async getPodcastTemplate(id: number): Promise<PodcastTemplate | undefined> {
-    const [template] = await db.select().from(podcastTemplates).where(eq(podcastTemplates.id, id));
-    return template || undefined;
-  }
 
-  async getAllPodcastTemplates(): Promise<PodcastTemplate[]> {
-    return await db.select().from(podcastTemplates);
-  }
-
-  async createPodcastTemplate(template: InsertPodcastTemplate): Promise<PodcastTemplate> {
-    const [newTemplate] = await db
-      .insert(podcastTemplates)
-      .values(template)
-      .returning();
-    return newTemplate;
-  }
-
-  async updatePodcastTemplate(id: number, template: Partial<InsertPodcastTemplate>): Promise<PodcastTemplate | undefined> {
-    const [updatedTemplate] = await db
-      .update(podcastTemplates)
-      .set(template)
-      .where(eq(podcastTemplates.id, id))
-      .returning();
-    return updatedTemplate || undefined;
-  }
-
-  async deletePodcastTemplate(id: number): Promise<boolean> {
-    const result = await db.delete(podcastTemplates).where(eq(podcastTemplates.id, id));
-    return result.rowCount > 0;
-  }
-
-  async getPodcastContent(id: number): Promise<PodcastContent | undefined> {
-    const [content] = await db.select().from(podcastContent).where(eq(podcastContent.id, id));
-    return content || undefined;
-  }
-
-  async getAllPodcastContent(): Promise<PodcastContent[]> {
-    return await db.select().from(podcastContent);
-  }
-
-  async getPodcastContentByDateRange(startDate: Date, endDate: Date): Promise<PodcastContent[]> {
-    return await db.select().from(podcastContent)
-      .where(and(
-        gte(podcastContent.createdAt, startDate),
-        lte(podcastContent.createdAt, endDate)
-      ));
-  }
-
-  async createPodcastContent(content: InsertPodcastContent): Promise<PodcastContent> {
-    const [newContent] = await db
-      .insert(podcastContent)
-      .values(content)
-      .returning();
-    return newContent;
-  }
-
-  async updatePodcastContent(id: number, content: Partial<InsertPodcastContent>): Promise<PodcastContent | undefined> {
-    const [updatedContent] = await db
-      .update(podcastContent)
-      .set(content)
-      .where(eq(podcastContent.id, id))
-      .returning();
-    return updatedContent || undefined;
-  }
 
   async getEphemerisData(date: Date, location?: string): Promise<EphemerisData | undefined> {
     const dateStr = date.toISOString().split('T')[0];

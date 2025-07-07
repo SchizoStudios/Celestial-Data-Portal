@@ -5,8 +5,6 @@ import { setupAuth, isAuthenticated } from "./replitAuth";
 import { 
   insertNatalChartSchema,
   insertAspectMonitorSchema,
-  insertPodcastTemplateSchema,
-  insertPodcastContentSchema,
   insertEphemerisDataSchema,
   ASPECT_TYPES
 } from "@shared/schema";
@@ -480,120 +478,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     return aspects;
   }
-
-  // Podcast Templates
-  app.get("/api/podcast-templates", async (req, res) => {
-    try {
-      const templates = await storage.getAllPodcastTemplates();
-      res.json(templates);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch podcast templates" });
-    }
-  });
-
-  app.post("/api/podcast-templates", async (req, res) => {
-    try {
-      const validatedData = insertPodcastTemplateSchema.parse(req.body);
-      const template = await storage.createPodcastTemplate(validatedData);
-      res.json(template);
-    } catch (error) {
-      res.status(400).json({ message: "Failed to create template: " + (error as Error).message });
-    }
-  });
-
-  app.put("/api/podcast-templates/:id", async (req, res) => {
-    try {
-      const partialData = insertPodcastTemplateSchema.partial().parse(req.body);
-      const template = await storage.updatePodcastTemplate(parseInt(req.params.id), partialData);
-      if (!template) {
-        return res.status(404).json({ message: "Template not found" });
-      }
-      res.json(template);
-    } catch (error) {
-      res.status(400).json({ message: "Failed to update template: " + (error as Error).message });
-    }
-  });
-
-  app.delete("/api/podcast-templates/:id", async (req, res) => {
-    try {
-      const success = await storage.deletePodcastTemplate(parseInt(req.params.id));
-      if (!success) {
-        return res.status(404).json({ message: "Template not found" });
-      }
-      res.json({ message: "Template deleted successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to delete template" });
-    }
-  });
-
-  // Podcast Content Generation
-  app.post("/api/podcast-content/generate", async (req, res) => {
-    try {
-      const { templateId, startDate, endDate, outputFormats } = req.body;
-      
-      const template = await storage.getPodcastTemplate(templateId);
-      if (!template) {
-        return res.status(404).json({ message: "Template not found" });
-      }
-      
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      const generatedContent = [];
-      
-      // Generate content for each day in range
-      for (let date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
-        const ephemerisData = await storage.getEphemerisData(date);
-        let templateData = {};
-        
-        if (ephemerisData) {
-          templateData = {
-            date: date.toDateString(),
-            sunrise_time: ephemerisData.solarData?.sunrise || "Unknown",
-            sunset_time: ephemerisData.solarData?.sunset || "Unknown",
-            moon_phase: ephemerisData.lunarData?.phase || "Unknown",
-            moon_illumination: ephemerisData.lunarData?.illumination || 0,
-            planetary_positions: JSON.stringify(ephemerisData.planetaryPositions || []),
-            active_aspects: "Current planetary aspects", // Simplified
-          };
-        }
-        
-        let textContent = template.content;
-        for (const [key, value] of Object.entries(templateData)) {
-          textContent = textContent.replace(new RegExp(`{${key}}`, 'g'), String(value));
-        }
-        
-        // Enhance with AI if enabled
-        if (outputFormats?.enhanceWithAI) {
-          textContent = await GeminiService.generatePodcastContent(textContent, templateData);
-        }
-        
-        const content = await storage.createPodcastContent({
-          templateId,
-          date: new Date(date),
-          textContent,
-          status: "generated",
-        });
-        
-        generatedContent.push(content);
-      }
-      
-      res.json({ 
-        message: "Content generated successfully",
-        content: generatedContent 
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to generate content: " + (error as Error).message });
-    }
-  });
-
-  app.get("/api/podcast-content", async (req, res) => {
-    try {
-      const content = await storage.getAllPodcastContent();
-      res.json(content);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch podcast content" });
-    }
-  });
 
   const httpServer = createServer(app);
   return httpServer;
