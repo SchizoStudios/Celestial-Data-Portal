@@ -129,6 +129,7 @@ Changelog:
 - July 07, 2025: Integrated Replit Auth with OpenID Connect for secure user authentication and session management
 - July 07, 2025: Fixed aspect tooltip functionality on dashboard - switched from hover tooltips to click-based popovers for better mobile interaction
 - July 07, 2025: Corrected aspect data path in AstrologyDataService to use proper vault structure (/Definitions/Aspects/ with categorized folders)
+- July 07, 2025: Fixed sunrise/sunset calculation algorithm - now shows accurate times (e.g., NYC July: sunrise ~5:40 AM, sunset ~8:00 PM)
 ```
 
 ## User Preferences
