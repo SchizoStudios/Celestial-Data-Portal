@@ -278,7 +278,7 @@ export default function NatalCharts() {
                   >
                     <h4 className="font-medium">{chart.name}</h4>
                     <p className="text-sm opacity-75">
-                      {new Date(chart.birthDate).toLocaleDateString()}
+                      {chart.birthDate ? new Date(chart.birthDate).toLocaleDateString() : 'Date not available'}
                     </p>
                     <p className="text-sm opacity-75">{chart.birthLocation}</p>
                   </div>
@@ -533,11 +533,11 @@ export default function NatalCharts() {
                 <CardContent>
                   <div className="mb-4">
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Born: {new Date(selectedChartData.birthDate).toLocaleDateString()}
+                      Born: {selectedChartData.birthDate ? new Date(selectedChartData.birthDate).toLocaleDateString() : 'Date not available'}
                       {selectedChartData.birthTime && ` at ${selectedChartData.birthTime}`}
                     </p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Location: {selectedChartData.birthLocation}
+                      Location: {selectedChartData.birthLocation || 'Location not available'}
                     </p>
                   </div>
                   

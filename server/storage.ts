@@ -68,16 +68,17 @@ export class MemStorage implements IStorage {
     const newChart: NatalChart = {
       ...chart,
       id,
+      birthDate: new Date(chart.birthDate),
       createdAt: new Date(),
       interpretation: chart.interpretation || null,
       birthTime: chart.birthTime || null,
-      enabledBodies: (chart.enabledBodies as string[]) || ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"],
-      enabledAspects: (chart.enabledAspects as string[]) || ["Conjunction", "Opposition", "Trine", "Square", "Sextile"],
-      majorAspects: (chart.majorAspects as string[]) || ["Conjunction", "Opposition", "Trine", "Square"],
-      minorAspects: (chart.minorAspects as string[]) || [],
-      harmonicAspects: (chart.harmonicAspects as string[]) || [],
-      septileAspects: (chart.septileAspects as string[]) || [],
-      novileAspects: (chart.novileAspects as string[]) || [],
+      enabledBodies: (chart.enabledBodies && Array.isArray(chart.enabledBodies)) ? chart.enabledBodies as string[] : ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"],
+      enabledAspects: (chart.enabledAspects && Array.isArray(chart.enabledAspects)) ? chart.enabledAspects as string[] : ["Conjunction", "Opposition", "Trine", "Square", "Sextile"],
+      majorAspects: (chart.majorAspects && Array.isArray(chart.majorAspects)) ? chart.majorAspects as string[] : ["Conjunction", "Opposition", "Trine", "Square"],
+      minorAspects: (chart.minorAspects && Array.isArray(chart.minorAspects)) ? chart.minorAspects as string[] : [],
+      harmonicAspects: (chart.harmonicAspects && Array.isArray(chart.harmonicAspects)) ? chart.harmonicAspects as string[] : [],
+      septileAspects: (chart.septileAspects && Array.isArray(chart.septileAspects)) ? chart.septileAspects as string[] : [],
+      novileAspects: (chart.novileAspects && Array.isArray(chart.novileAspects)) ? chart.novileAspects as string[] : [],
       chartData: chart.chartData || null,
     };
     this.natalCharts.set(id, newChart);
@@ -91,8 +92,15 @@ export class MemStorage implements IStorage {
     const updated = { 
       ...existing, 
       ...chart,
-      enabledBodies: Array.isArray(chart.enabledBodies) ? chart.enabledBodies : existing.enabledBodies,
-      enabledAspects: Array.isArray(chart.enabledAspects) ? chart.enabledAspects : existing.enabledAspects,
+      birthDate: chart.birthDate ? new Date(chart.birthDate) : existing.birthDate,
+      updatedAt: new Date(),
+      enabledBodies: (chart.enabledBodies && Array.isArray(chart.enabledBodies)) ? chart.enabledBodies as string[] : existing.enabledBodies,
+      enabledAspects: (chart.enabledAspects && Array.isArray(chart.enabledAspects)) ? chart.enabledAspects as string[] : existing.enabledAspects,
+      majorAspects: (chart.majorAspects && Array.isArray(chart.majorAspects)) ? chart.majorAspects as string[] : existing.majorAspects,
+      minorAspects: (chart.minorAspects && Array.isArray(chart.minorAspects)) ? chart.minorAspects as string[] : existing.minorAspects,
+      harmonicAspects: (chart.harmonicAspects && Array.isArray(chart.harmonicAspects)) ? chart.harmonicAspects as string[] : existing.harmonicAspects,
+      septileAspects: (chart.septileAspects && Array.isArray(chart.septileAspects)) ? chart.septileAspects as string[] : existing.septileAspects,
+      novileAspects: (chart.novileAspects && Array.isArray(chart.novileAspects)) ? chart.novileAspects as string[] : existing.novileAspects,
     };
     this.natalCharts.set(id, updated);
     return updated;
