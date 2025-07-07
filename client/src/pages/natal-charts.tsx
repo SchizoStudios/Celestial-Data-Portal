@@ -8,14 +8,18 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { CircleDot, Brain, Save, FileDown, Share, Plus } from "lucide-react";
+import { CircleDot, Brain, Save, FileDown, Share, Plus, Edit2, MapPin, AlertCircle } from "lucide-react";
 import ChartCanvas from "@/components/chart-canvas";
 import { CELESTIAL_BODIES, ASPECT_TYPES, ASPECT_CATEGORIES } from "@shared/schema";
+import { LocationService, type LocationResult } from "@/lib/location-service";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function NatalCharts() {
   const { toast } = useToast();
   const [selectedChart, setSelectedChart] = useState<number | null>(null);
   const [showNewChart, setShowNewChart] = useState(false);
+  const [editingChart, setEditingChart] = useState<number | null>(null);
+  const [formErrors, setFormErrors] = useState<string[]>([]);
   
   // Form state for new chart
   const [formData, setFormData] = useState({
@@ -31,68 +35,68 @@ export default function NatalCharts() {
   });
 
   // Location autocomplete state
-  const [locationSuggestions, setLocationSuggestions] = useState<Array<{
-    name: string;
-    lat: number;
-    lng: number;
-    country: string;
-  }>>([]);
+  const [locationSuggestions, setLocationSuggestions] = useState<LocationResult[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
 
-  // Location database for autocomplete
-  const locationDatabase = [
-    { name: "New York, NY", lat: 40.7128, lng: -74.0060, country: "USA" },
-    { name: "Los Angeles, CA", lat: 34.0522, lng: -118.2437, country: "USA" },
-    { name: "Chicago, IL", lat: 41.8781, lng: -87.6298, country: "USA" },
-    { name: "Houston, TX", lat: 29.7604, lng: -95.3698, country: "USA" },
-    { name: "Phoenix, AZ", lat: 33.4484, lng: -112.0740, country: "USA" },
-    { name: "Philadelphia, PA", lat: 39.9526, lng: -75.1652, country: "USA" },
-    { name: "San Antonio, TX", lat: 29.4241, lng: -98.4936, country: "USA" },
-    { name: "San Diego, CA", lat: 32.7157, lng: -117.1611, country: "USA" },
-    { name: "Dallas, TX", lat: 32.7767, lng: -96.7970, country: "USA" },
-    { name: "San Jose, CA", lat: 37.3382, lng: -121.8863, country: "USA" },
-    { name: "Austin, TX", lat: 30.2672, lng: -97.7431, country: "USA" },
-    { name: "London, UK", lat: 51.5074, lng: -0.1278, country: "UK" },
-    { name: "Paris, France", lat: 48.8566, lng: 2.3522, country: "France" },
-    { name: "Berlin, Germany", lat: 52.5200, lng: 13.4050, country: "Germany" },
-    { name: "Tokyo, Japan", lat: 35.6762, lng: 139.6503, country: "Japan" },
-    { name: "Sydney, Australia", lat: -33.8688, lng: 151.2093, country: "Australia" },
-    { name: "Toronto, Canada", lat: 43.6510, lng: -79.3470, country: "Canada" },
-    { name: "Vancouver, Canada", lat: 49.2827, lng: -123.1207, country: "Canada" },
-    { name: "Mexico City, Mexico", lat: 19.4326, lng: -99.1332, country: "Mexico" },
-    { name: "São Paulo, Brazil", lat: -23.5505, lng: -46.6333, country: "Brazil" },
-    { name: "Buenos Aires, Argentina", lat: -34.6118, lng: -58.3960, country: "Argentina" },
-    { name: "Mumbai, India", lat: 19.0760, lng: 72.8777, country: "India" },
-    { name: "Delhi, India", lat: 28.7041, lng: 77.1025, country: "India" },
-    { name: "Shanghai, China", lat: 31.2304, lng: 121.4737, country: "China" },
-    { name: "Beijing, China", lat: 39.9042, lng: 116.4074, country: "China" },
-  ];
+  // Enhanced location handling with comprehensive mapping APIs
 
-  // Handle location input change and show suggestions
-  const handleLocationChange = (value: string) => {
+  // Enhanced location handling with real mapping APIs
+  const handleLocationChange = async (value: string) => {
     setFormData(prev => ({ ...prev, birthLocation: value }));
+    setFormErrors(prev => prev.filter(err => !err.includes('location')));
     
     if (value.length > 2) {
-      const filtered = locationDatabase.filter(loc => 
-        loc.name.toLowerCase().includes(value.toLowerCase()) ||
-        loc.country.toLowerCase().includes(value.toLowerCase())
-      ).slice(0, 5);
-      setLocationSuggestions(filtered);
-      setShowSuggestions(filtered.length > 0);
+      setIsLoadingLocation(true);
+      try {
+        const results = await LocationService.searchLocations(value);
+        setLocationSuggestions(results);
+        setShowSuggestions(results.length > 0);
+      } catch (error) {
+        console.error('Location search failed:', error);
+        setFormErrors(prev => [...prev, 'Location search temporarily unavailable. Please enter coordinates manually.']);
+      } finally {
+        setIsLoadingLocation(false);
+      }
     } else {
+      setLocationSuggestions([]);
       setShowSuggestions(false);
     }
   };
 
-  // Handle location selection from suggestions
-  const selectLocation = (location: { name: string; lat: number; lng: number; country: string }) => {
+  const selectLocation = (location: LocationResult) => {
     setFormData(prev => ({
       ...prev,
       birthLocation: location.name,
       latitude: location.lat.toString(),
-      longitude: location.lng.toString(),
+      longitude: location.lng.toString()
     }));
     setShowSuggestions(false);
+    setLocationSuggestions([]);
+  };
+
+  // Get current location from browser
+  const handleGetCurrentLocation = async () => {
+    setIsLoadingLocation(true);
+    try {
+      const position = await LocationService.getCurrentLocation();
+      if (position) {
+        const locationName = await LocationService.reverseGeocode(position.lat, position.lng);
+        setFormData(prev => ({
+          ...prev,
+          birthLocation: locationName,
+          latitude: position.lat.toString(),
+          longitude: position.lng.toString()
+        }));
+        toast({ title: "Location detected", description: `Set to ${locationName}` });
+      } else {
+        setFormErrors(prev => [...prev, 'Unable to access device location. Please search manually.']);
+      }
+    } catch (error) {
+      setFormErrors(prev => [...prev, 'Location detection failed. Please search manually.']);
+    } finally {
+      setIsLoadingLocation(false);
+    }
   };
 
   // Fetch natal charts
@@ -119,12 +123,44 @@ export default function NatalCharts() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/natal-charts"] });
       setShowNewChart(false);
+      setEditingChart(null);
       setSelectedChart(newChart.id);
+      setFormErrors([]);
     },
     onError: (error) => {
+      const errorMessage = error.message || 'Unknown error occurred';
+      setFormErrors([`Failed to create chart: ${errorMessage}`]);
       toast({
         title: "Error",
-        description: "Failed to create chart: " + error.message,
+        description: "Failed to create chart: " + errorMessage,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Update chart mutation for editing
+  const updateChartMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      const response = await apiRequest("PUT", `/api/natal-charts/${id}`, data);
+      return response.json();
+    },
+    onSuccess: (updatedChart) => {
+      toast({
+        title: "Chart Updated",
+        description: `Natal chart for ${updatedChart.name} has been updated successfully.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/natal-charts"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/natal-charts", updatedChart.id] });
+      setEditingChart(null);
+      setShowNewChart(false);
+      setFormErrors([]);
+    },
+    onError: (error) => {
+      const errorMessage = error.message || 'Unknown error occurred';
+      setFormErrors([`Failed to update chart: ${errorMessage}`]);
+      toast({
+        title: "Error",
+        description: "Failed to update chart: " + errorMessage,
         variant: "destructive",
       });
     },
@@ -264,6 +300,20 @@ export default function NatalCharts() {
                 <CardTitle>Create New Natal Chart</CardTitle>
               </CardHeader>
               <CardContent>
+                {/* Error Display */}
+                {formErrors.length > 0 && (
+                  <Alert variant="destructive" className="mb-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      <ul className="list-disc list-inside space-y-1">
+                        {formErrors.map((error, index) => (
+                          <li key={index}>{error}</li>
+                        ))}
+                      </ul>
+                    </AlertDescription>
+                  </Alert>
+                )}
+                
                 <form onSubmit={handleSubmit} className="space-y-6">
                   {/* Basic Information */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -300,18 +350,36 @@ export default function NatalCharts() {
                       />
                     </div>
                     <div className="relative">
-                      <Label htmlFor="birthLocation">Birth Location *</Label>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="birthLocation">Birth Location *</Label>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={handleGetCurrentLocation}
+                          disabled={isLoadingLocation}
+                          className="text-xs"
+                        >
+                          <MapPin className="h-3 w-3 mr-1" />
+                          {isLoadingLocation ? 'Locating...' : 'Use Current'}
+                        </Button>
+                      </div>
                       <Input
                         id="birthLocation"
                         value={formData.birthLocation}
                         onChange={(e) => handleLocationChange(e.target.value)}
                         onFocus={() => formData.birthLocation.length > 2 && setShowSuggestions(true)}
                         onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
-                        placeholder="Start typing city name..."
+                        placeholder="Start typing any city worldwide..."
                         required
                       />
+                      {isLoadingLocation && (
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Searching locations...
+                        </div>
+                      )}
                       {showSuggestions && locationSuggestions.length > 0 && (
-                        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg">
+                        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg max-h-64 overflow-y-auto">
                           {locationSuggestions.map((location, index) => (
                             <div
                               key={index}
