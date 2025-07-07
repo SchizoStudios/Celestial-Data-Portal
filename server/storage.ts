@@ -74,6 +74,11 @@ export class MemStorage implements IStorage {
       enabledBodies: (chart.enabledBodies as string[]) || ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"],
       enabledAspects: (chart.enabledAspects as string[]) || ["Conjunction", "Opposition", "Trine", "Square", "Sextile"],
       majorAspects: (chart.majorAspects as string[]) || ["Conjunction", "Opposition", "Trine", "Square"],
+      minorAspects: (chart.minorAspects as string[]) || [],
+      harmonicAspects: (chart.harmonicAspects as string[]) || [],
+      septileAspects: (chart.septileAspects as string[]) || [],
+      novileAspects: (chart.novileAspects as string[]) || [],
+      chartData: chart.chartData || null,
     };
     this.natalCharts.set(id, newChart);
     return newChart;

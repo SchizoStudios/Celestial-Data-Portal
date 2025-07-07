@@ -158,12 +158,36 @@ export class AstronomicalService {
   static calculateAspects(positions: PlanetaryPosition[], enabledAspects: string[]): AspectData[] {
     const aspects: AspectData[] = [];
     const aspectTypes = [
+      // Major Aspects
       { name: "Conjunction", symbol: "☌", degrees: 0, orb: 8 },
       { name: "Opposition", symbol: "☍", degrees: 180, orb: 8 },
-      { name: "Trine", symbol: "△", degrees: 120, orb: 6 },
-      { name: "Square", symbol: "☐", degrees: 90, orb: 6 },
       { name: "Sextile", symbol: "⚹", degrees: 60, orb: 4 },
-      { name: "Quincunx", symbol: "⚻", degrees: 150, orb: 3 },
+      { name: "Square", symbol: "□", degrees: 90, orb: 6 },
+      { name: "Trine", symbol: "△", degrees: 120, orb: 6 },
+      
+      // Minor Aspects
+      { name: "Inconjunction", symbol: "⚻", degrees: 150, orb: 3 },
+      { name: "Quindecile", symbol: "24°", degrees: 24, orb: 1 },
+      { name: "Semisextile", symbol: "⚺", degrees: 30, orb: 2 },
+      { name: "Semisquare", symbol: "◻︎", degrees: 45, orb: 2 },
+      { name: "Sesquiquadrate", symbol: "⚼", degrees: 135, orb: 2 },
+      
+      // Harmonic Aspects
+      { name: "Biquintile", symbol: "⛤", degrees: 144, orb: 1 },
+      { name: "Decile", symbol: "✷", degrees: 36, orb: 1 },
+      { name: "Quintile", symbol: "⬠", degrees: 72, orb: 1 },
+      { name: "Tridecile", symbol: "108°", degrees: 108, orb: 1 },
+      { name: "Vigintile", symbol: "1/20", degrees: 18, orb: 1 },
+      
+      // Septile Aspects
+      { name: "Biseptile", symbol: "⚯", degrees: 102.86, orb: 1 },
+      { name: "Septile", symbol: "⚯", degrees: 51.43, orb: 1 },
+      { name: "Triseptile", symbol: "⚯", degrees: 154.29, orb: 1 },
+      
+      // Novile Aspects
+      { name: "Binovile", symbol: "∟", degrees: 80, orb: 1 },
+      { name: "Novile", symbol: "☊", degrees: 40, orb: 1 },
+      { name: "Quadrinovile", symbol: "⅘", degrees: 160, orb: 1 },
     ];
 
     for (let i = 0; i < positions.length; i++) {
