@@ -71,8 +71,9 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
       interpretation: chart.interpretation || null,
       birthTime: chart.birthTime || null,
-      enabledBodies: Array.isArray(chart.enabledBodies) ? chart.enabledBodies : [],
-      enabledAspects: Array.isArray(chart.enabledAspects) ? chart.enabledAspects : [],
+      enabledBodies: (chart.enabledBodies as string[]) || ["Sun", "Moon", "Mercury", "Venus", "Mars", "Jupiter", "Saturn"],
+      enabledAspects: (chart.enabledAspects as string[]) || ["Conjunction", "Opposition", "Trine", "Square", "Sextile"],
+      majorAspects: (chart.majorAspects as string[]) || ["Conjunction", "Opposition", "Trine", "Square"],
     };
     this.natalCharts.set(id, newChart);
     return newChart;
@@ -156,7 +157,7 @@ export class MemStorage implements IStorage {
       id,
       createdAt: now,
       updatedAt: now,
-      availableFields: Array.isArray(template.availableFields) ? template.availableFields : [],
+      availableFields: (template.availableFields as string[]) || [],
     };
     this.podcastTemplates.set(id, newTemplate);
     return newTemplate;

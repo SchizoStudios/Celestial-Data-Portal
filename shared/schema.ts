@@ -14,6 +14,7 @@ export const natalCharts = pgTable("natal_charts", {
   timezone: text("timezone").notNull(),
   enabledBodies: jsonb("enabled_bodies").$type<string[]>().notNull().default([]),
   enabledAspects: jsonb("enabled_aspects").$type<string[]>().notNull().default([]),
+  majorAspects: jsonb("major_aspects").$type<string[]>().notNull().default(["Conjunction", "Opposition", "Trine", "Square"]),
   chartData: jsonb("chart_data").$type<any>(), // Planetary positions, houses, aspects
   interpretation: text("interpretation"),
   createdAt: timestamp("created_at").defaultNow(),
