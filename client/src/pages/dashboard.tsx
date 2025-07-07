@@ -18,7 +18,7 @@ export default function Dashboard() {
   const [selectedLocation, setSelectedLocation] = useState("New York, NY");
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
-  // Load persistent location on component mount
+  // Load persistent location on component mount and setup offline monitoring
   useEffect(() => {
     try {
       const savedLocation = localStorage.getItem('persistentLocation');
@@ -31,6 +31,21 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Failed to load persistent location:', error);
     }
+
+    // Initialize offline storage
+    offlineStorage.init().catch(console.error);
+
+    // Monitor online/offline status
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
   
   // Custom location state for dashboard
