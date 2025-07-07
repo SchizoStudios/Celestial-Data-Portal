@@ -69,6 +69,10 @@ export class MemStorage implements IStorage {
       ...chart,
       id,
       createdAt: new Date(),
+      interpretation: chart.interpretation || null,
+      birthTime: chart.birthTime || null,
+      enabledBodies: Array.isArray(chart.enabledBodies) ? chart.enabledBodies : [],
+      enabledAspects: Array.isArray(chart.enabledAspects) ? chart.enabledAspects : [],
     };
     this.natalCharts.set(id, newChart);
     return newChart;
@@ -78,7 +82,12 @@ export class MemStorage implements IStorage {
     const existing = this.natalCharts.get(id);
     if (!existing) return undefined;
     
-    const updated = { ...existing, ...chart };
+    const updated = { 
+      ...existing, 
+      ...chart,
+      enabledBodies: Array.isArray(chart.enabledBodies) ? chart.enabledBodies : existing.enabledBodies,
+      enabledAspects: Array.isArray(chart.enabledAspects) ? chart.enabledAspects : existing.enabledAspects,
+    };
     this.natalCharts.set(id, updated);
     return updated;
   }
@@ -106,6 +115,12 @@ export class MemStorage implements IStorage {
       ...monitor,
       id,
       createdAt: new Date(),
+      orb: monitor.orb || 3,
+      monitorType: monitor.monitorType || 'exact',
+      dailyNotifications: monitor.dailyNotifications || false,
+      weeklyDigest: monitor.weeklyDigest || true,
+      emailNotifications: monitor.emailNotifications || false,
+      isActive: monitor.isActive !== undefined ? monitor.isActive : true,
     };
     this.aspectMonitors.set(id, newMonitor);
     return newMonitor;
@@ -141,6 +156,7 @@ export class MemStorage implements IStorage {
       id,
       createdAt: now,
       updatedAt: now,
+      availableFields: Array.isArray(template.availableFields) ? template.availableFields : [],
     };
     this.podcastTemplates.set(id, newTemplate);
     return newTemplate;
@@ -150,7 +166,12 @@ export class MemStorage implements IStorage {
     const existing = this.podcastTemplates.get(id);
     if (!existing) return undefined;
     
-    const updated = { ...existing, ...template, updatedAt: new Date() };
+    const updated = { 
+      ...existing, 
+      ...template, 
+      updatedAt: new Date(),
+      availableFields: Array.isArray(template.availableFields) ? template.availableFields : existing.availableFields,
+    };
     this.podcastTemplates.set(id, updated);
     return updated;
   }
@@ -180,6 +201,11 @@ export class MemStorage implements IStorage {
       ...content,
       id,
       createdAt: new Date(),
+      status: content.status || 'draft',
+      templateId: content.templateId || null,
+      audioUrl: content.audioUrl || null,
+      videoUrl: content.videoUrl || null,
+      visualizationStyle: content.visualizationStyle || null,
     };
     this.podcastContent.set(id, newContent);
     return newContent;
@@ -206,6 +232,12 @@ export class MemStorage implements IStorage {
       ...data,
       id,
       cachedAt: new Date(),
+      location: data.location || null,
+      latitude: data.latitude || null,
+      longitude: data.longitude || null,
+      solarData: data.solarData || null,
+      lunarData: data.lunarData || null,
+      planetaryPositions: data.planetaryPositions || [],
     };
     const key = `${data.date.toISOString().split('T')[0]}-${data.location || 'default'}`;
     this.ephemerisData.set(key, newData);

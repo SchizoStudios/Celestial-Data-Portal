@@ -8,6 +8,7 @@ import Dashboard from "@/pages/dashboard";
 import NatalCharts from "@/pages/natal-charts";
 import AspectMonitor from "@/pages/aspect-monitor";
 import AdminPodcast from "@/pages/admin-podcast";
+import AdminTemplates from "@/pages/admin-templates";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import NotFound from "@/pages/not-found";
@@ -20,6 +21,7 @@ function Router() {
       <Route path="/natal-charts" component={NatalCharts} />
       <Route path="/aspect-monitor" component={AspectMonitor} />
       <Route path="/admin-podcast" component={AdminPodcast} />
+      <Route path="/admin-templates" component={AdminTemplates} />
       <Route component={NotFound} />
     </Switch>
   );

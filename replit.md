@@ -41,7 +41,8 @@ This is a full-stack astronomical data portal application built for calculating,
 
 ### Astronomical Services
 - **AstronomicalService**: Calculates planetary positions, aspects, and chart data
-- **OpenAIService**: Generates astrological interpretations and podcast content using GPT-4o
+- **GeminiService**: Generates astrological interpretations and podcast content using Google Gemini 2.5 Flash/Pro
+- **AstrologyDataService**: Integrates comprehensive astrology data from user's vault for enhanced interpretations
 - **Chart Renderer**: SVG-based natal chart visualization system
 
 ### Storage Layer
@@ -94,13 +95,17 @@ This is a full-stack astronomical data portal application built for calculating,
 
 ### Environment Variables
 - `DATABASE_URL`: PostgreSQL connection string
-- `OPENAI_API_KEY` or `OPENAI_KEY`: OpenAI API authentication
+- `GEMINI_API_KEY`: Google Gemini API authentication
 - `NODE_ENV`: Environment mode (development/production)
 
 ## Changelog
 ```
 Changelog:
-- July 07, 2025. Initial setup
+- July 07, 2025: Initial setup
+- July 07, 2025: Switched from OpenAI to Google Gemini 2.5 Flash/Pro for AI interpretations
+- July 07, 2025: Integrated comprehensive astrology data from user's "Astrology Arith(m)etic Vault"
+- July 07, 2025: Added admin templates page for podcast content management
+- July 07, 2025: Enhanced storage layer with proper type handling
 ```
 
 ## User Preferences

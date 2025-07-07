@@ -9,7 +9,7 @@ import {
   insertEphemerisDataSchema
 } from "@shared/schema";
 import { AstronomicalService } from "./services/astronomical";
-import { OpenAIService } from "./services/openai";
+import { GeminiService } from "./services/gemini";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -46,11 +46,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         validatedData.longitude
       );
       
-      const aspects = AstronomicalService.calculateAspects(positions, validatedData.enabledAspects);
+      const aspects = AstronomicalService.calculateAspects(positions, validatedData.enabledAspects || []);
       
       const chartData = {
-        positions,
-        aspects,
+        positions: positions || [],
+        aspects: aspects || [],
         houses: [], // Simplified - would calculate houses in full implementation
       };
       
@@ -72,7 +72,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Chart not found" });
       }
 
-      const interpretation = await OpenAIService.generateChartInterpretation(
+      const interpretation = await GeminiService.generateChartInterpretation(
         chart.chartData,
         {
           name: chart.name,
@@ -291,7 +291,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Enhance with AI if enabled
         if (outputFormats?.enhanceWithAI) {
-          textContent = await OpenAIService.generatePodcastContent(textContent, templateData);
+          textContent = await GeminiService.generatePodcastContent(textContent, templateData);
         }
         
         const content = await storage.createPodcastContent({
