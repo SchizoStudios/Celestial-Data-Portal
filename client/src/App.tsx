@@ -15,6 +15,7 @@ import Home from "@/pages/home";
 import Navbar from "@/components/navbar";
 import Sidebar from "@/components/sidebar";
 import NotFound from "@/pages/not-found";
+import PWAInstaller from "@/components/pwa-installer";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -62,6 +63,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <AppContent darkMode={darkMode} setDarkMode={setDarkMode} />
+        <PWAInstaller />
         <Toaster />
       </TooltipProvider>
     </QueryClientProvider>
