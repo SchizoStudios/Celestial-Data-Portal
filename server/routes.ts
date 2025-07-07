@@ -10,6 +10,7 @@ import {
 } from "@shared/schema";
 import { AstronomicalService } from "./services/astronomical";
 import { GeminiService } from "./services/gemini";
+import { AspectInterpretationService } from "./services/aspect-interpretations";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -246,6 +247,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(aspects);
     } catch (error) {
       res.status(500).json({ message: "Failed to calculate current aspects" });
+    }
+  });
+
+  // Aspect interpretation endpoint
+  app.get("/api/aspects/:body1/:aspectType/:body2/interpretation", async (req, res) => {
+    try {
+      const { body1, aspectType, body2 } = req.params;
+      const interpretation = AspectInterpretationService.getCachedInterpretation(body1, aspectType, body2);
+      res.json(interpretation);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get aspect interpretation" });
     }
   });
 

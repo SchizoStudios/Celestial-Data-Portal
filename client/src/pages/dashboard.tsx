@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sun, Moon, Share2, Globe, Plus, Download, Calendar, MapPin, Clock } from "lucide-react";
 import { useState } from "react";
 import { Link } from "wouter";
+import AspectTooltip from "@/components/aspect-tooltip";
 
 export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -235,22 +236,31 @@ export default function Dashboard() {
                 {currentAspects.map((aspect: any, index: number) => {
                   const status = getAspectStatus(aspect.orb);
                   return (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-3 h-3 ${getAspectColor(aspect.aspectType)} rounded-full`}></div>
-                        <div>
-                          <p className="font-medium text-sm">
-                            {aspect.body1} {aspect.aspectSymbol} {aspect.body2}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            Orb: {aspect.orb.toFixed(1)}°
-                          </p>
+                    <AspectTooltip
+                      key={index}
+                      body1={aspect.body1}
+                      aspectType={aspect.aspectType}
+                      body2={aspect.body2}
+                      aspectSymbol={aspect.aspectSymbol}
+                      orb={aspect.orb}
+                    >
+                      <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-help">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-3 h-3 ${getAspectColor(aspect.aspectType)} rounded-full`}></div>
+                          <div>
+                            <p className="font-medium text-sm">
+                              {aspect.body1} {aspect.aspectType} {aspect.body2}
+                            </p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              Orb: {aspect.orb.toFixed(1)}°
+                            </p>
+                          </div>
                         </div>
+                        <span className={`text-xs px-2 py-1 rounded ${status.color}`}>
+                          {status.label}
+                        </span>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded ${status.color}`}>
-                        {status.label}
-                      </span>
-                    </div>
+                    </AspectTooltip>
                   );
                 })}
               </div>
