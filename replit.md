@@ -19,6 +19,8 @@ This is a full-stack astronomical data portal application built for calculating,
 - **Language**: TypeScript with ES modules
 - **Database**: PostgreSQL with Drizzle ORM
 - **Database Provider**: Neon Database (serverless PostgreSQL)
+- **Authentication**: Replit Auth with OpenID Connect
+- **Session Management**: PostgreSQL-backed sessions with connect-pg-simple
 - **API**: RESTful endpoints with JSON responses
 - **External Services**: OpenAI API for content generation
 
@@ -33,6 +35,8 @@ This is a full-stack astronomical data portal application built for calculating,
 ## Key Components
 
 ### Database Schema (Drizzle)
+- **Users**: User profiles with Replit Auth integration
+- **Sessions**: PostgreSQL-backed session storage for authentication
 - **Natal Charts**: Store birth data, calculated positions, aspects, and AI interpretations
 - **Aspect Monitors**: Track specific astrological aspects with notification preferences
 - **Podcast Templates**: Content templates for automated podcast generation
@@ -52,12 +56,13 @@ This is a full-stack astronomical data portal application built for calculating,
 
 ## Data Flow
 
-1. **User Input**: Birth data, monitoring preferences, or content requests
-2. **Calculation**: Astronomical calculations for planetary positions and aspects
-3. **Storage**: Persistent storage of charts, monitors, and generated content
-4. **AI Enhancement**: OpenAI integration for interpretations and content generation
-5. **Visualization**: SVG chart rendering and responsive UI components
-6. **Export**: Audio/video generation capabilities for podcast content
+1. **Authentication**: Replit Auth handles user login/logout with session management
+2. **User Input**: Birth data, monitoring preferences, or content requests
+3. **Calculation**: Astronomical calculations for planetary positions and aspects
+4. **Storage**: Persistent storage of charts, monitors, and generated content
+5. **AI Enhancement**: OpenAI integration for interpretations and content generation
+6. **Visualization**: SVG chart rendering and responsive UI components
+7. **Export**: Audio/video generation capabilities for podcast content
 
 ## External Dependencies
 
@@ -67,6 +72,10 @@ This is a full-stack astronomical data portal application built for calculating,
 - **@tanstack/react-query**: Server state management
 - **openai**: AI content generation
 - **@radix-ui/***: Headless UI components
+- **openid-client**: OpenID Connect client for Replit Auth
+- **passport**: Authentication middleware
+- **express-session**: Session management
+- **connect-pg-simple**: PostgreSQL session store
 
 ### Development Tools
 - **Vite**: Build tool with HMR and development server
@@ -96,6 +105,10 @@ This is a full-stack astronomical data portal application built for calculating,
 ### Environment Variables
 - `DATABASE_URL`: PostgreSQL connection string
 - `GEMINI_API_KEY`: Google Gemini API authentication
+- `SESSION_SECRET`: Secret key for session encryption
+- `REPL_ID`: Replit application ID for authentication
+- `REPLIT_DOMAINS`: Comma-separated list of authorized domains
+- `ISSUER_URL`: OpenID Connect issuer URL (defaults to replit.com/oidc)
 - `NODE_ENV`: Environment mode (development/production)
 
 ## Changelog
@@ -113,6 +126,7 @@ Changelog:
 - July 07, 2025: Created aspect interpretation tooltips with caching using Astrology Arith(m)etic Vault data
 - July 07, 2025: Implemented dashboard settings with persistent location, time management, zodiac systems, and house calculation systems
 - July 07, 2025: Added View Full Ephemeris functionality and comprehensive dashboard customization
+- July 07, 2025: Integrated Replit Auth with OpenID Connect for secure user authentication and session management
 ```
 
 ## User Preferences

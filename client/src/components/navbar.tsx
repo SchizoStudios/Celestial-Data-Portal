@@ -1,6 +1,7 @@
-import { Bell, Moon, Sun, Satellite } from "lucide-react";
+import { Bell, Moon, Sun, Satellite, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "wouter";
+import { useAuth } from "@/hooks/useAuth";
 
 interface NavbarProps {
   darkMode: boolean;
@@ -8,6 +9,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ darkMode, setDarkMode }: NavbarProps) {
+  const { user } = useAuth();
   const [location] = useLocation();
 
   const navItems = [
@@ -80,12 +82,32 @@ export default function Navbar({ darkMode, setDarkMode }: NavbarProps) {
             
             {/* User Menu */}
             <div className="flex items-center space-x-2">
-              <img 
-                src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=32&h=32" 
-                alt="User Avatar" 
-                className="w-8 h-8 rounded-full"
-              />
-              <span className="hidden sm:block text-sm font-medium">John Doe</span>
+              {user?.profileImageUrl ? (
+                <img 
+                  src={user.profileImageUrl} 
+                  alt="User Avatar" 
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-8 h-8 rounded-full bg-stellar-amber/20 flex items-center justify-center">
+                  <User className="h-4 w-4 text-stellar-amber" />
+                </div>
+              )}
+              <span className="hidden sm:block text-sm font-medium text-gray-900 dark:text-white">
+                {user?.firstName && user?.lastName ? 
+                  `${user.firstName} ${user.lastName}` : 
+                  user?.email || 'User'
+                }
+              </span>
+              <Button 
+                variant="ghost"
+                size="sm"
+                onClick={() => window.location.href = '/api/logout'}
+                className="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700"
+                title="Sign Out"
+              >
+                <LogOut className="h-4 w-4 text-gray-600 dark:text-gray-300" />
+              </Button>
             </div>
           </div>
         </div>

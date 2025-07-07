@@ -8,10 +8,17 @@ import {
   PodcastContent,
   InsertPodcastContent,
   EphemerisData,
-  InsertEphemerisData
+  InsertEphemerisData,
+  User,
+  UpsertUser
 } from "@shared/schema";
 
 export interface IStorage {
+  // User operations
+  // (IMPORTANT) these user operations are mandatory for Replit Auth.
+  getUser(id: string): Promise<User | undefined>;
+  upsertUser(user: UpsertUser): Promise<User>;
+
   // Natal Charts
   getNatalChart(id: number): Promise<NatalChart | undefined>;
   getAllNatalCharts(): Promise<NatalChart[]>;
@@ -47,12 +54,34 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
+  private users: Map<string, User> = new Map();
   private natalCharts: Map<number, NatalChart> = new Map();
   private aspectMonitors: Map<number, AspectMonitor> = new Map();
   private podcastTemplates: Map<number, PodcastTemplate> = new Map();
   private podcastContent: Map<number, PodcastContent> = new Map();
   private ephemerisData: Map<string, EphemerisData> = new Map();
   private currentId: number = 1;
+
+  // User operations
+  // (IMPORTANT) these user operations are mandatory for Replit Auth.
+  async getUser(id: string): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const existing = this.users.get(userData.id);
+    const user: User = {
+      ...userData,
+      createdAt: existing?.createdAt || new Date(),
+      updatedAt: new Date(),
+      email: userData.email || existing?.email || null,
+      firstName: userData.firstName || existing?.firstName || null,
+      lastName: userData.lastName || existing?.lastName || null,
+      profileImageUrl: userData.profileImageUrl || existing?.profileImageUrl || null,
+    };
+    this.users.set(userData.id, user);
+    return user;
+  }
 
   // Natal Charts
   async getNatalChart(id: number): Promise<NatalChart | undefined> {
