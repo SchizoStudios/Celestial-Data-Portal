@@ -1,0 +1,175 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* Custom celestial colors */
+  --celestial-blue: hsl(207, 76%, 54%);
+  --stellar-amber: hsl(45, 100%, 52%);
+  --mystical-purple: hsl(258, 100%, 66%);
+  --deep-space: hsl(0, 0%, 7%);
+  --nebula-gray: hsl(0, 0%, 12%);
+  --star-white: hsl(0, 0%, 88%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(207, 90%, 54%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+  
+  /* Dark mode celestial colors */
+  --celestial-blue: hsl(207, 76%, 54%);
+  --stellar-amber: hsl(45, 100%, 52%);
+  --mystical-purple: hsl(258, 100%, 66%);
+  --deep-space: hsl(0, 0%, 7%);
+  --nebula-gray: hsl(0, 0%, 12%);
+  --star-white: hsl(0, 0%, 88%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-celestial-blue {
+    color: var(--celestial-blue);
+  }
+  
+  .bg-celestial-blue {
+    background-color: var(--celestial-blue);
+  }
+  
+  .border-celestial-blue {
+    border-color: var(--celestial-blue);
+  }
+  
+  .text-stellar-amber {
+    color: var(--stellar-amber);
+  }
+  
+  .bg-stellar-amber {
+    background-color: var(--stellar-amber);
+  }
+  
+  .text-mystical-purple {
+    color: var(--mystical-purple);
+  }
+  
+  .bg-mystical-purple {
+    background-color: var(--mystical-purple);
+  }
+  
+  .bg-deep-space {
+    background-color: var(--deep-space);
+  }
+  
+  .bg-nebula-gray {
+    background-color: var(--nebula-gray);
+  }
+  
+  .text-star-white {
+    color: var(--star-white);
+  }
+}
+
+/* Chart canvas styling */
+.chart-canvas {
+  border-radius: var(--radius);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Aspect monitor notifications */
+.aspect-notification {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Admin panel styling */
+.admin-section {
+  background: linear-gradient(135deg, hsl(45, 100%, 96%) 0%, hsl(39, 100%, 96%) 100%);
+  border: 1px solid hsl(45, 60%, 80%);
+}
+
+.dark .admin-section {
+  background: linear-gradient(135deg, hsl(45, 100%, 8%) 0%, hsl(39, 100%, 8%) 100%);
+  border: 1px solid hsl(45, 40%, 20%);
+}
+
+/* Celestial animations for video generation */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--celestial-blue);
+  }
+  50% {
+    box-shadow: 0 0 20px var(--celestial-blue), 0 0 30px var(--celestial-blue);
+  }
+}
+
+.celestial-rotate {
+  animation: rotate 20s linear infinite;
+}
+
+.celestial-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
