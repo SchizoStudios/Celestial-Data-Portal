@@ -10,14 +10,30 @@ import { Link } from "wouter";
 export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedLocation, setSelectedLocation] = useState("New York, NY");
+  const [customLocation, setCustomLocation] = useState("");
+  const [showCustomLocation, setShowCustomLocation] = useState(false);
   const [selectedTime, setSelectedTime] = useState("12:00");
+
+  const handleLocationChange = (value: string) => {
+    if (value === "Custom Location...") {
+      setShowCustomLocation(true);
+      setSelectedLocation("");
+    } else {
+      setShowCustomLocation(false);
+      setSelectedLocation(value);
+    }
+  };
+
+  // Get current location for API call
+  const currentLocation = showCustomLocation ? customLocation : selectedLocation;
 
   // Fetch ephemeris data for today
   const { data: ephemerisData, isLoading: ephemerisLoading } = useQuery({
     queryKey: ["/api/ephemeris", { 
       date: selectedDate,
-      location: selectedLocation
+      location: currentLocation
     }],
+    enabled: !!currentLocation, // Only fetch when we have a location
   });
 
   // Fetch current aspects
@@ -85,17 +101,42 @@ export default function Dashboard() {
               </div>
               <div className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4 text-celestial-blue" />
-                <Select value={selectedLocation} onValueChange={setSelectedLocation}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="New York, NY">New York, NY</SelectItem>
-                    <SelectItem value="Los Angeles, CA">Los Angeles, CA</SelectItem>
-                    <SelectItem value="London, UK">London, UK</SelectItem>
-                    <SelectItem value="Custom Location...">Custom Location...</SelectItem>
-                  </SelectContent>
-                </Select>
+                {showCustomLocation ? (
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      placeholder="Enter custom location..."
+                      value={customLocation}
+                      onChange={(e) => setCustomLocation(e.target.value)}
+                      className="w-48"
+                    />
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => {
+                        setShowCustomLocation(false);
+                        setSelectedLocation("New York, NY");
+                        setCustomLocation("");
+                      }}
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                ) : (
+                  <Select value={selectedLocation} onValueChange={handleLocationChange}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="New York, NY">New York, NY</SelectItem>
+                      <SelectItem value="Los Angeles, CA">Los Angeles, CA</SelectItem>
+                      <SelectItem value="London, UK">London, UK</SelectItem>
+                      <SelectItem value="Paris, France">Paris, France</SelectItem>
+                      <SelectItem value="Tokyo, Japan">Tokyo, Japan</SelectItem>
+                      <SelectItem value="Sydney, Australia">Sydney, Australia</SelectItem>
+                      <SelectItem value="Custom Location...">Custom Location...</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
               <div className="flex items-center space-x-2">
                 <Clock className="h-4 w-4 text-celestial-blue" />

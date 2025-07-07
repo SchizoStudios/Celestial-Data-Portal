@@ -106,6 +106,8 @@ Changelog:
 - July 07, 2025: Integrated comprehensive astrology data from user's "Astrology Arith(m)etic Vault"
 - July 07, 2025: Added admin templates page for podcast content management
 - July 07, 2025: Enhanced storage layer with proper type handling
+- July 07, 2025: Implemented comprehensive aspect system with 26 aspects across 5 categories (Major, Minor, Harmonic, Septile, Novile)
+- July 07, 2025: Fixed dashboard custom location functionality with proper coordinate mapping
 ```
 
 ## User Preferences

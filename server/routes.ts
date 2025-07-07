@@ -176,8 +176,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const requestedDate = new Date(date as string);
-      const lat = parseFloat(latitude as string) || 40.7128; // Default to NYC
-      const lng = parseFloat(longitude as string) || -74.0060;
+      
+      // Location coordinate mapping
+      const locationCoords: Record<string, { lat: number; lng: number }> = {
+        "New York, NY": { lat: 40.7128, lng: -74.0060 },
+        "Los Angeles, CA": { lat: 34.0522, lng: -118.2437 },
+        "London, UK": { lat: 51.5074, lng: -0.1278 },
+        "Paris, France": { lat: 48.8566, lng: 2.3522 },
+        "Tokyo, Japan": { lat: 35.6762, lng: 139.6503 },
+        "Sydney, Australia": { lat: -33.8688, lng: 151.2093 },
+      };
+      
+      let lat: number, lng: number;
+      
+      if (latitude && longitude) {
+        // Use provided coordinates
+        lat = parseFloat(latitude as string);
+        lng = parseFloat(longitude as string);
+      } else if (location && locationCoords[location as string]) {
+        // Use mapped coordinates
+        const coords = locationCoords[location as string];
+        lat = coords.lat;
+        lng = coords.lng;
+      } else {
+        // Default to NYC
+        lat = 40.7128;
+        lng = -74.0060;
+      }
       const loc = location as string || "New York, NY";
       
       // Check cache first
