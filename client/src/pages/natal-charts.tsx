@@ -30,6 +30,71 @@ export default function NatalCharts() {
     enabledAspects: ["Conjunction", "Opposition", "Trine", "Square"],
   });
 
+  // Location autocomplete state
+  const [locationSuggestions, setLocationSuggestions] = useState<Array<{
+    name: string;
+    lat: number;
+    lng: number;
+    country: string;
+  }>>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  // Location database for autocomplete
+  const locationDatabase = [
+    { name: "New York, NY", lat: 40.7128, lng: -74.0060, country: "USA" },
+    { name: "Los Angeles, CA", lat: 34.0522, lng: -118.2437, country: "USA" },
+    { name: "Chicago, IL", lat: 41.8781, lng: -87.6298, country: "USA" },
+    { name: "Houston, TX", lat: 29.7604, lng: -95.3698, country: "USA" },
+    { name: "Phoenix, AZ", lat: 33.4484, lng: -112.0740, country: "USA" },
+    { name: "Philadelphia, PA", lat: 39.9526, lng: -75.1652, country: "USA" },
+    { name: "San Antonio, TX", lat: 29.4241, lng: -98.4936, country: "USA" },
+    { name: "San Diego, CA", lat: 32.7157, lng: -117.1611, country: "USA" },
+    { name: "Dallas, TX", lat: 32.7767, lng: -96.7970, country: "USA" },
+    { name: "San Jose, CA", lat: 37.3382, lng: -121.8863, country: "USA" },
+    { name: "Austin, TX", lat: 30.2672, lng: -97.7431, country: "USA" },
+    { name: "London, UK", lat: 51.5074, lng: -0.1278, country: "UK" },
+    { name: "Paris, France", lat: 48.8566, lng: 2.3522, country: "France" },
+    { name: "Berlin, Germany", lat: 52.5200, lng: 13.4050, country: "Germany" },
+    { name: "Tokyo, Japan", lat: 35.6762, lng: 139.6503, country: "Japan" },
+    { name: "Sydney, Australia", lat: -33.8688, lng: 151.2093, country: "Australia" },
+    { name: "Toronto, Canada", lat: 43.6510, lng: -79.3470, country: "Canada" },
+    { name: "Vancouver, Canada", lat: 49.2827, lng: -123.1207, country: "Canada" },
+    { name: "Mexico City, Mexico", lat: 19.4326, lng: -99.1332, country: "Mexico" },
+    { name: "São Paulo, Brazil", lat: -23.5505, lng: -46.6333, country: "Brazil" },
+    { name: "Buenos Aires, Argentina", lat: -34.6118, lng: -58.3960, country: "Argentina" },
+    { name: "Mumbai, India", lat: 19.0760, lng: 72.8777, country: "India" },
+    { name: "Delhi, India", lat: 28.7041, lng: 77.1025, country: "India" },
+    { name: "Shanghai, China", lat: 31.2304, lng: 121.4737, country: "China" },
+    { name: "Beijing, China", lat: 39.9042, lng: 116.4074, country: "China" },
+  ];
+
+  // Handle location input change and show suggestions
+  const handleLocationChange = (value: string) => {
+    setFormData(prev => ({ ...prev, birthLocation: value }));
+    
+    if (value.length > 2) {
+      const filtered = locationDatabase.filter(loc => 
+        loc.name.toLowerCase().includes(value.toLowerCase()) ||
+        loc.country.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 5);
+      setLocationSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  // Handle location selection from suggestions
+  const selectLocation = (location: { name: string; lat: number; lng: number; country: string }) => {
+    setFormData(prev => ({
+      ...prev,
+      birthLocation: location.name,
+      latitude: location.lat.toString(),
+      longitude: location.lng.toString(),
+    }));
+    setShowSuggestions(false);
+  };
+
   // Fetch natal charts
   const { data: charts, isLoading } = useQuery({
     queryKey: ["/api/natal-charts"],
@@ -234,15 +299,33 @@ export default function NatalCharts() {
                         onChange={(e) => setFormData(prev => ({ ...prev, birthTime: e.target.value }))}
                       />
                     </div>
-                    <div>
+                    <div className="relative">
                       <Label htmlFor="birthLocation">Birth Location *</Label>
                       <Input
                         id="birthLocation"
                         value={formData.birthLocation}
-                        onChange={(e) => setFormData(prev => ({ ...prev, birthLocation: e.target.value }))}
-                        placeholder="City, State/Country"
+                        onChange={(e) => handleLocationChange(e.target.value)}
+                        onFocus={() => formData.birthLocation.length > 2 && setShowSuggestions(true)}
+                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                        placeholder="Start typing city name..."
                         required
                       />
+                      {showSuggestions && locationSuggestions.length > 0 && (
+                        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg">
+                          {locationSuggestions.map((location, index) => (
+                            <div
+                              key={index}
+                              onClick={() => selectLocation(location)}
+                              className="px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-600 last:border-b-0"
+                            >
+                              <div className="font-medium text-sm">{location.name}</div>
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                {location.country} • {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -255,8 +338,11 @@ export default function NatalCharts() {
                         step="0.000001"
                         value={formData.latitude}
                         onChange={(e) => setFormData(prev => ({ ...prev, latitude: e.target.value }))}
-                        placeholder="40.7128"
+                        placeholder="40.7128 (auto-filled from location)"
                       />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Auto-populated when selecting a location, but editable
+                      </p>
                     </div>
                     <div>
                       <Label htmlFor="longitude">Longitude</Label>
@@ -266,8 +352,11 @@ export default function NatalCharts() {
                         step="0.000001"
                         value={formData.longitude}
                         onChange={(e) => setFormData(prev => ({ ...prev, longitude: e.target.value }))}
-                        placeholder="-74.0060"
+                        placeholder="-74.0060 (auto-filled from location)"
                       />
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Auto-populated when selecting a location, but editable
+                      </p>
                     </div>
                   </div>
 
