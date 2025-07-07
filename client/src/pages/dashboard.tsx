@@ -29,11 +29,19 @@ export default function Dashboard() {
 
   // Fetch ephemeris data for today
   const { data: ephemerisData, isLoading: ephemerisLoading } = useQuery({
-    queryKey: ["/api/ephemeris", { 
-      date: selectedDate,
-      location: currentLocation
-    }],
-    enabled: !!currentLocation, // Only fetch when we have a location
+    queryKey: ["/api/ephemeris", selectedDate, currentLocation],
+    queryFn: async () => {
+      const params = new URLSearchParams({
+        date: selectedDate,
+        location: currentLocation || "New York, NY"
+      });
+      const response = await fetch(`/api/ephemeris?${params}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch ephemeris data');
+      }
+      return response.json();
+    },
+    enabled: !!selectedDate && !!currentLocation, // Only fetch when we have both date and location
   });
 
   // Fetch current aspects
