@@ -3,10 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sun, Moon, Share2, Globe, Plus, Download, Calendar, MapPin, Clock } from "lucide-react";
-import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Sun, Moon, Share2, Globe, Plus, Download, Calendar, MapPin, Clock, Eye, Settings, AlertCircle } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import AspectTooltip from "@/components/aspect-tooltip";
+import DashboardSettingsComponent from "@/components/dashboard-settings";
 
 export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);

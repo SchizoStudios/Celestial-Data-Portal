@@ -108,6 +108,11 @@ Changelog:
 - July 07, 2025: Enhanced storage layer with proper type handling
 - July 07, 2025: Implemented comprehensive aspect system with 26 aspects across 5 categories (Major, Minor, Harmonic, Septile, Novile)
 - July 07, 2025: Fixed dashboard custom location functionality with proper coordinate mapping
+- July 07, 2025: Implemented comprehensive location services using OpenStreetMap Nominatim API for worldwide geocoding
+- July 07, 2025: Added natal chart editing functionality with validation and error handling
+- July 07, 2025: Created aspect interpretation tooltips with caching using Astrology Arith(m)etic Vault data
+- July 07, 2025: Implemented dashboard settings with persistent location, time management, zodiac systems, and house calculation systems
+- July 07, 2025: Added View Full Ephemeris functionality and comprehensive dashboard customization
 ```
 
 ## User Preferences

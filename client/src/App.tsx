@@ -20,6 +20,7 @@ function Router() {
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/natal-charts" component={NatalCharts} />
       <Route path="/aspect-monitor" component={AspectMonitor} />
+      <Route path="/ephemeris" component={Dashboard} />
       <Route path="/admin-podcast" component={AdminPodcast} />
       <Route path="/admin-templates" component={AdminTemplates} />
       <Route component={NotFound} />
