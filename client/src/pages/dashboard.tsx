@@ -231,8 +231,8 @@ export default function Dashboard() {
                 <div className="h-12 bg-gray-200 rounded animate-pulse"></div>
               </div>
             ) : currentAspects && currentAspects.length > 0 ? (
-              <div className="space-y-3">
-                {currentAspects.slice(0, 3).map((aspect: any, index: number) => {
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {currentAspects.map((aspect: any, index: number) => {
                   const status = getAspectStatus(aspect.orb);
                   return (
                     <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -253,11 +253,6 @@ export default function Dashboard() {
                     </div>
                   );
                 })}
-                <Link href="/aspect-monitor">
-                  <Button variant="link" className="w-full text-celestial-blue hover:text-blue-700">
-                    View All Aspects →
-                  </Button>
-                </Link>
               </div>
             ) : (
               <p className="text-gray-500 dark:text-gray-400 text-center py-4">

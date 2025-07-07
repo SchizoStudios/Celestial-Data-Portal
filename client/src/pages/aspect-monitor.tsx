@@ -234,9 +234,9 @@ export default function AspectMonitor() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {ASPECT_TYPES.map((aspect) => (
-                          <SelectItem key={aspect.name} value={aspect.name}>
-                            {aspect.name} ({aspect.degrees}°)
+                        {Object.entries(ASPECT_TYPES).map(([name, aspect]) => (
+                          <SelectItem key={name} value={name}>
+                            {name} ({aspect.degrees}°)
                           </SelectItem>
                         ))}
                       </SelectContent>
