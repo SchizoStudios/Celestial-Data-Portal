@@ -42,14 +42,26 @@ export class AstrologyDataService {
   // Enhanced Aspect data from the vault
   static getAspectData(aspectType: string): any {
     try {
-      const aspectsPath = path.join(this.basePath, 'Complete Astrology', '05_Aspects');
-      // Load from aspects directory when available
-      const files = fs.readdirSync(aspectsPath);
-      const aspectFile = files.find(f => f.toLowerCase().includes(aspectType.toLowerCase()));
+      const aspectsBasePath = path.join(this.basePath, 'Definitions', 'Aspects');
       
-      if (aspectFile) {
-        const content = fs.readFileSync(path.join(aspectsPath, aspectFile), 'utf-8');
-        return this.parseMarkdownContent(content);
+      // Search through all aspect categories (1 Major, 2 Minor, 3 Harmonic, etc.)
+      const aspectCategories = ['1 Major', '2 Minor', '3 Harmonic', '4 Septile Family', '5 Novile Family', '6 Decile Family', '9 Custom'];
+      
+      for (const category of aspectCategories) {
+        const categoryPath = path.join(aspectsBasePath, category);
+        if (fs.existsSync(categoryPath)) {
+          const files = fs.readdirSync(categoryPath);
+          // Look for aspect file that matches the aspectType
+          const aspectFile = files.find(f => 
+            f.toLowerCase().includes(aspectType.toLowerCase()) && 
+            f.endsWith('.md')
+          );
+          
+          if (aspectFile) {
+            const content = fs.readFileSync(path.join(categoryPath, aspectFile), 'utf-8');
+            return this.parseMarkdownContent(content);
+          }
+        }
       }
     } catch (error) {
       console.warn(`Could not load aspect data for ${aspectType}:`, error);
