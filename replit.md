@@ -130,6 +130,9 @@ Changelog:
 - July 07, 2025: Fixed aspect tooltip functionality on dashboard - switched from hover tooltips to click-based popovers for better mobile interaction
 - July 07, 2025: Corrected aspect data path in AstrologyDataService to use proper vault structure (/Definitions/Aspects/ with categorized folders)
 - July 07, 2025: Fixed sunrise/sunset calculation algorithm - now shows accurate times (e.g., NYC July: sunrise ~5:40 AM, sunset ~8:00 PM)
+- July 07, 2025: Implemented Progressive Web App (PWA) functionality with offline capabilities - added manifest.json, service worker, and IndexedDB offline storage
+- July 07, 2025: Added PWA installer component for native app-like experience on iPhone, Android, and Linux platforms
+- July 07, 2025: Created comprehensive offline storage system using IndexedDB for natal charts, ephemeris data, and user preferences
 ```
 
 ## User Preferences

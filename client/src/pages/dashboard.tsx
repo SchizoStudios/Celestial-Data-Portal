@@ -217,8 +217,18 @@ export default function Dashboard() {
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Astronomical Dashboard</h2>
-            <p className="text-gray-600 dark:text-gray-400">Real-time celestial data and astrological insights</p>
+            <div className="flex items-center space-x-3">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Astronomical Dashboard</h2>
+              {isOffline && (
+                <Badge variant="secondary" className="flex items-center space-x-1">
+                  <WifiOff className="h-3 w-3" />
+                  <span>Offline Mode</span>
+                </Badge>
+              )}
+            </div>
+            <p className="text-gray-600 dark:text-gray-400">
+              {isOffline ? "Working offline with cached data" : "Real-time celestial data and astrological insights"}
+            </p>
           </div>
           <div className="flex space-x-3">
             <Link href="/natal-charts">
