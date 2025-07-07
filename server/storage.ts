@@ -1,4 +1,10 @@
 import { 
+  users,
+  natalCharts,
+  aspectMonitors,
+  podcastTemplates,
+  podcastContent,
+  ephemerisData,
   NatalChart, 
   InsertNatalChart,
   AspectMonitor,
@@ -12,6 +18,8 @@ import {
   User,
   UpsertUser
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, gte, lte } from "drizzle-orm";
 
 export interface IStorage {
   // User operations
@@ -284,6 +292,188 @@ export class MemStorage implements IStorage {
     };
     const key = `${data.date.toISOString().split('T')[0]}-${data.location || 'default'}`;
     this.ephemerisData.set(key, newData);
+    return newData;
+  }
+}
+
+export class DatabaseStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          profileImageUrl: userData.profileImageUrl,
+          updatedAt: new Date(),
+          // Preserve user preferences on update
+          defaultLocation: userData.defaultLocation,
+          defaultLatitude: userData.defaultLatitude,
+          defaultLongitude: userData.defaultLongitude,
+          timeFormat: userData.timeFormat,
+          zodiacSystem: userData.zodiacSystem,
+          houseSystem: userData.houseSystem,
+          enabledAspects: userData.enabledAspects,
+        },
+      })
+      .returning();
+    return user;
+  }
+
+  async getNatalChart(id: number): Promise<NatalChart | undefined> {
+    const [chart] = await db.select().from(natalCharts).where(eq(natalCharts.id, id));
+    return chart || undefined;
+  }
+
+  async getAllNatalCharts(): Promise<NatalChart[]> {
+    return await db.select().from(natalCharts);
+  }
+
+  async createNatalChart(chart: InsertNatalChart): Promise<NatalChart> {
+    const [newChart] = await db
+      .insert(natalCharts)
+      .values(chart)
+      .returning();
+    return newChart;
+  }
+
+  async updateNatalChart(id: number, chart: Partial<InsertNatalChart>): Promise<NatalChart | undefined> {
+    const [updatedChart] = await db
+      .update(natalCharts)
+      .set(chart)
+      .where(eq(natalCharts.id, id))
+      .returning();
+    return updatedChart || undefined;
+  }
+
+  async deleteNatalChart(id: number): Promise<boolean> {
+    const result = await db.delete(natalCharts).where(eq(natalCharts.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getAspectMonitor(id: number): Promise<AspectMonitor | undefined> {
+    const [monitor] = await db.select().from(aspectMonitors).where(eq(aspectMonitors.id, id));
+    return monitor || undefined;
+  }
+
+  async getAllAspectMonitors(): Promise<AspectMonitor[]> {
+    return await db.select().from(aspectMonitors);
+  }
+
+  async getActiveAspectMonitors(): Promise<AspectMonitor[]> {
+    return await db.select().from(aspectMonitors).where(eq(aspectMonitors.isActive, true));
+  }
+
+  async createAspectMonitor(monitor: InsertAspectMonitor): Promise<AspectMonitor> {
+    const [newMonitor] = await db
+      .insert(aspectMonitors)
+      .values(monitor)
+      .returning();
+    return newMonitor;
+  }
+
+  async updateAspectMonitor(id: number, monitor: Partial<InsertAspectMonitor>): Promise<AspectMonitor | undefined> {
+    const [updatedMonitor] = await db
+      .update(aspectMonitors)
+      .set(monitor)
+      .where(eq(aspectMonitors.id, id))
+      .returning();
+    return updatedMonitor || undefined;
+  }
+
+  async deleteAspectMonitor(id: number): Promise<boolean> {
+    const result = await db.delete(aspectMonitors).where(eq(aspectMonitors.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getPodcastTemplate(id: number): Promise<PodcastTemplate | undefined> {
+    const [template] = await db.select().from(podcastTemplates).where(eq(podcastTemplates.id, id));
+    return template || undefined;
+  }
+
+  async getAllPodcastTemplates(): Promise<PodcastTemplate[]> {
+    return await db.select().from(podcastTemplates);
+  }
+
+  async createPodcastTemplate(template: InsertPodcastTemplate): Promise<PodcastTemplate> {
+    const [newTemplate] = await db
+      .insert(podcastTemplates)
+      .values(template)
+      .returning();
+    return newTemplate;
+  }
+
+  async updatePodcastTemplate(id: number, template: Partial<InsertPodcastTemplate>): Promise<PodcastTemplate | undefined> {
+    const [updatedTemplate] = await db
+      .update(podcastTemplates)
+      .set(template)
+      .where(eq(podcastTemplates.id, id))
+      .returning();
+    return updatedTemplate || undefined;
+  }
+
+  async deletePodcastTemplate(id: number): Promise<boolean> {
+    const result = await db.delete(podcastTemplates).where(eq(podcastTemplates.id, id));
+    return result.rowCount > 0;
+  }
+
+  async getPodcastContent(id: number): Promise<PodcastContent | undefined> {
+    const [content] = await db.select().from(podcastContent).where(eq(podcastContent.id, id));
+    return content || undefined;
+  }
+
+  async getAllPodcastContent(): Promise<PodcastContent[]> {
+    return await db.select().from(podcastContent);
+  }
+
+  async getPodcastContentByDateRange(startDate: Date, endDate: Date): Promise<PodcastContent[]> {
+    return await db.select().from(podcastContent)
+      .where(and(
+        gte(podcastContent.createdAt, startDate),
+        lte(podcastContent.createdAt, endDate)
+      ));
+  }
+
+  async createPodcastContent(content: InsertPodcastContent): Promise<PodcastContent> {
+    const [newContent] = await db
+      .insert(podcastContent)
+      .values(content)
+      .returning();
+    return newContent;
+  }
+
+  async updatePodcastContent(id: number, content: Partial<InsertPodcastContent>): Promise<PodcastContent | undefined> {
+    const [updatedContent] = await db
+      .update(podcastContent)
+      .set(content)
+      .where(eq(podcastContent.id, id))
+      .returning();
+    return updatedContent || undefined;
+  }
+
+  async getEphemerisData(date: Date, location?: string): Promise<EphemerisData | undefined> {
+    const dateStr = date.toISOString().split('T')[0];
+    const [data] = await db.select().from(ephemerisData)
+      .where(and(
+        eq(ephemerisData.date, date),
+        location ? eq(ephemerisData.location, location) : undefined
+      ));
+    return data || undefined;
+  }
+
+  async createEphemerisData(data: InsertEphemerisData): Promise<EphemerisData> {
+    const [newData] = await db
+      .insert(ephemerisData)
+      .values(data)
+      .returning();
     return newData;
   }
 }

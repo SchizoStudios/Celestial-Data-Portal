@@ -24,6 +24,16 @@ export const users = pgTable("users", {
   profileImageUrl: varchar("profile_image_url"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  // User preferences
+  defaultLocation: text("default_location"),
+  defaultLatitude: real("default_latitude"),
+  defaultLongitude: real("default_longitude"),
+  timeFormat: text("time_format").default("12"),
+  zodiacSystem: text("zodiac_system").default("tropical"),
+  houseSystem: text("house_system").default("placidus"),
+  enabledAspects: text("enabled_aspects").array().default([
+    "conjunction", "opposition", "trine", "square", "sextile", "quincunx"
+  ]),
 });
 
 export type UpsertUser = typeof users.$inferInsert;

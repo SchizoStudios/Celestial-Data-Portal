@@ -114,12 +114,21 @@ export default function DashboardSettingsComponent({
   };
 
   const selectLocation = (location: LocationResult) => {
-    setLocalSettings(prev => ({
-      ...prev,
+    const newSettings = {
+      ...localSettings,
+      location: location.name,
+      latitude: location.lat,
+      longitude: location.lng
+    };
+    setLocalSettings(newSettings);
+    
+    // Save location to localStorage for persistence
+    localStorage.setItem('persistentLocation', JSON.stringify({
       location: location.name,
       latitude: location.lat,
       longitude: location.lng
     }));
+    
     setShowLocationSuggestions(false);
     setLocationSuggestions([]);
   };
@@ -131,8 +140,16 @@ export default function DashboardSettingsComponent({
       const position = await LocationService.getCurrentLocation();
       if (position) {
         const locationName = await LocationService.reverseGeocode(position.lat, position.lng);
-        setLocalSettings(prev => ({
-          ...prev,
+        const newSettings = {
+          ...localSettings,
+          location: locationName,
+          latitude: position.lat,
+          longitude: position.lng
+        };
+        setLocalSettings(newSettings);
+        
+        // Save location to localStorage for persistence
+        localStorage.setItem('persistentLocation', JSON.stringify({
           location: locationName,
           latitude: position.lat,
           longitude: position.lng

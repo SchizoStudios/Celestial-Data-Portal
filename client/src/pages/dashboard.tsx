@@ -15,6 +15,21 @@ import { useToast } from "@/hooks/use-toast";
 export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedLocation, setSelectedLocation] = useState("New York, NY");
+
+  // Load persistent location on component mount
+  useEffect(() => {
+    try {
+      const savedLocation = localStorage.getItem('persistentLocation');
+      if (savedLocation) {
+        const locationData = JSON.parse(savedLocation);
+        if (locationData.location) {
+          setSelectedLocation(locationData.location);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load persistent location:', error);
+    }
+  }, []);
   
   // Custom location state for dashboard
   const [showCustomLocation, setShowCustomLocation] = useState(false);
@@ -81,6 +96,14 @@ export default function Dashboard() {
         setSelectedLocation(location.name);
         setShowCustomLocation(false);
         setCustomLocation("");
+        
+        // Save location to localStorage for persistence
+        localStorage.setItem('persistentLocation', JSON.stringify({
+          location: location.name,
+          latitude: location.lat,
+          longitude: location.lng
+        }));
+        
         toast({
           title: "Location Updated",
           description: `Location set to ${location.name}`,
