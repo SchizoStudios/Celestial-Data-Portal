@@ -152,14 +152,19 @@ export default function AdminTemplates() {
         </div>
         <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
           <Button 
-            variant="outline" 
+            variant={showAssistant ? "default" : "outline"}
             onClick={() => setShowAssistant(!showAssistant)}
             className="w-full sm:w-auto"
           >
             <HelpCircle className="mr-2 h-4 w-4" />
-            {showAssistant ? 'Hide' : 'Show'} Assistant
+            {showAssistant ? 'Hide' : 'Template'} Assistant
           </Button>
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+          <Dialog open={isCreateOpen} onOpenChange={(open) => {
+            setIsCreateOpen(open);
+            if (open && !showAssistant) {
+              setShowAssistant(true);
+            }
+          }}>
             <DialogTrigger asChild>
               <Button className="w-full sm:w-auto">
                 <Plus className="h-4 w-4 mr-2" />
@@ -170,7 +175,12 @@ export default function AdminTemplates() {
             <DialogHeader>
               <DialogTitle>Create New Template</DialogTitle>
               <DialogDescription>
-                Design a template for generating podcast content with dynamic fields
+                Design a template for generating podcast content with dynamic fields. 
+                {!showAssistant && (
+                  <span className="text-blue-600 dark:text-blue-400"> 
+                    Click "Template Assistant" above for help with variables and examples.
+                  </span>
+                )}
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
